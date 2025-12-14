@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Php + React + Shadcn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+    <script>
+        const CONFIG = @json([
+            'csrf_token' => csrf_token(),
+            'api_base_url' => home_url('/api'),
+            'dashboard_root' => '/',
+            'user' => is_logged() ? user()->toArray() : null,
+            'app' => [
+                'name' => env('app.name', 'TinyMVC App'),
+            ],
+        ]);
+    </script>
+    @vite('app.jsx')
+</head>
+
+<body>
+    <div id="root"></div>
+</body>
+
+</html>
