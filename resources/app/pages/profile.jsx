@@ -165,7 +165,7 @@ export default function Profile() {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first_name">
+                    <Label htmlFor="first_name" className="block mb-2">
                       First Name{" "}
                       <span className="text-muted-foreground text-xs">
                         (optional)
@@ -191,7 +191,7 @@ export default function Profile() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="last_name">
+                    <Label htmlFor="last_name" className="block mb-2">
                       Last Name{" "}
                       <span className="text-muted-foreground text-xs">
                         (optional)
@@ -219,8 +219,8 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username">
-                    Username <span className="text-destructive">*</span>
+                  <Label htmlFor="username" className="block mb-2">
+                    Username <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
                     id="username"
@@ -244,8 +244,8 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">
-                    Email <span className="text-destructive">*</span>
+                  <Label htmlFor="email" className="block mb-2">
+                    Email <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
                     id="email"
@@ -295,8 +295,8 @@ export default function Profile() {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="current_password">
-                    Current Password <span className="text-destructive">*</span>
+                  <Label htmlFor="current_password" className="block mb-2">
+                    Current Password <sup className="text-destructive">*</sup>
                   </Label>
                   <div className="relative">
                     <Input
@@ -337,8 +337,8 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="new_password">
-                    New Password <span className="text-destructive">*</span>
+                  <Label htmlFor="new_password" className="block mb-2">
+                    New Password <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
                     id="new_password"
@@ -367,9 +367,12 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="new_password_confirmation">
+                  <Label
+                    htmlFor="new_password_confirmation"
+                    className="block mb-2"
+                  >
                     Confirm New Password{" "}
-                    <span className="text-destructive">*</span>
+                    <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
                     id="new_password_confirmation"

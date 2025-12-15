@@ -9,11 +9,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { Link } from "react-router";
+
 export function Notifications() {
   const notifications = [
     {
       id: 1,
       title: "New order",
+      slug: "/orders/1",
       description: "Mrs. Eldridge Koch ordered 2 products.",
       time: "26 minutes ago",
       read: false,
@@ -22,6 +25,7 @@ export function Notifications() {
     {
       id: 2,
       title: "New order",
+      slug: "/orders/2",
       description: "Dr. Angelo Rempel ordered 3 products.",
       time: "26 minutes ago",
       read: false,
@@ -30,6 +34,7 @@ export function Notifications() {
     {
       id: 3,
       title: "New order",
+      slug: "/orders/3",
       description: "Marlon VonRueden ordered 3 products.",
       time: "26 minutes ago",
       read: false,
@@ -38,6 +43,7 @@ export function Notifications() {
     {
       id: 4,
       title: "New order",
+      slug: "/orders/4",
       description: "Daniela Schulist Sr. ordered 3 products.",
       time: "26 minutes ago",
       read: true,
@@ -46,6 +52,7 @@ export function Notifications() {
     {
       id: 5,
       title: "New order",
+      slug: "/orders/5",
       description: "Madisyn Considine ordered 4 products.",
       time: "26 minutes ago",
       read: true,
@@ -54,6 +61,7 @@ export function Notifications() {
     {
       id: 6,
       title: "New order",
+      slug: "/orders/6",
       description: "Arvid Lynch ordered 2 products.",
       time: "26 minutes ago",
       read: true,
@@ -153,13 +161,14 @@ export function Notifications() {
                       <p className="text-sm text-muted-foreground leading-snug">
                         {notification.description}
                       </p>
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="h-auto p-0 text-sm text-primary hover:no-underline cursor-pointer"
-                      >
-                        View
-                      </Button>
+                      {notification.slug && (
+                        <Link
+                          to={notification.slug}
+                          className="h-auto p-0 text-sm text-primary hover:no-underline cursor-pointer"
+                        >
+                          View
+                        </Link>
+                      )}
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Button

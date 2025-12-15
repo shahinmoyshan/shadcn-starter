@@ -79,6 +79,18 @@ export const AppProvider = ({ children }) => {
         icon: FileText,
       },
     ],
+    hidden: [
+      {
+        title: "Profile",
+        url: "/profile",
+        icon: null,
+      },
+      {
+        title: "Order Details",
+        url: "/order/:id",
+        icon: null,
+      },
+    ],
   };
 
   const currentMenu = useMemo(() => {
@@ -109,6 +121,16 @@ export const AppProvider = ({ children }) => {
     // Check secondary nav
     for (const item of menu.navSecondary || []) {
       if (item.url === path) {
+        return { title: item.title, url: item.url, icon: item.icon };
+      }
+    }
+
+    // Check hidden nav
+    for (const item of menu.hidden || []) {
+      if (
+        item.url === path ||
+        (item.url.includes(":") && path.startsWith(item.url.split("/:")[0]))
+      ) {
         return { title: item.title, url: item.url, icon: item.icon };
       }
     }
