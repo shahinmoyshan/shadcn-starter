@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { auth } from "@/lib/api";
 
 const AuthContext = createContext(null);
 
@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
 
   const login = useMutation({
     mutationFn: async ({ user, password, remember_me = false }) => {
-      const response = await axios.post("/auth/login", {
+      const response = await auth.login({
         user,
         password,
         remember_me,
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
 
   const logout = useMutation({
     mutationFn: async () => {
-      const response = await axios.post("/auth/logout");
+      const response = await auth.logout();
       return response.data;
     },
     onMutate: () => {

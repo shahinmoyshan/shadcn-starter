@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Eclipse } from "lucide-react";
 
+import { Link } from "react-router";
+
 import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -30,20 +32,22 @@ export function AppSidebar({ ...props }) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
+              <Link to={CONFIG.home_url || "/"}>
                 <Eclipse className="size-5!" />
                 <span className="text-base font-semibold">
                   {CONFIG.app.name}
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={menu.navMain} />
-        <NavDocuments items={menu.documents} />
-        <NavSecondary items={menu.navSecondary} className="mt-auto" />
+        {menu.navMain && <NavMain items={menu.navMain} />}
+        {menu.documents && <NavDocuments items={menu.documents} />}
+        {menu.navSecondary && (
+          <NavSecondary items={menu.navSecondary} className="mt-auto" />
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocation, Link } from "react-router";
 import { MoreHorizontal, Folder, Share2, Trash2 } from "lucide-react";
 
 import {
@@ -21,6 +22,9 @@ import {
 
 export function NavDocuments({ items }) {
   const { isMobile } = useSidebar();
+  const location = useLocation();
+
+  const isActive = (url) => location.pathname === url;
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -28,11 +32,11 @@ export function NavDocuments({ items }) {
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
+            <SidebarMenuButton asChild isActive={isActive(item.url)}>
+              <Link to={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

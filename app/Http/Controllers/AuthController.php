@@ -52,4 +52,49 @@ class AuthController extends Controller
             'message' => __('Logout successful.'),
         ];
     }
+
+    public function profile(Request $request)
+    {
+        $input = $request->validate([
+            'action' => 'in:general,password',
+            'first_name' => 'string|min:4|max:100',
+            'last_name' => 'string|min:4|max:100',
+            'username' => 'required_if:action,general|string|min:4|max:50|unique:users,username,' . user('id'),
+            'email' => 'required_if:action,general|email|max:100|unique:users,email,' . user('id'),
+            'current_password' => 'required_if:action,password|string|min:8|max:100',
+            'new_password' => 'required_if:action,password|string|min:8|max:100|confirmed',
+        ]);
+
+        $user = user();
+        if ($input->text('action') === 'general') {
+            $user->fill($input->only(['first_name', 'last_name', 'username', 'email']));
+            $user->save();
+
+            return [
+                'success' => true,
+                'message' => __('Profile updated successfully.'),
+                'user' => $user,
+            ];
+        } elseif ($input->text('action') === 'password') {
+            if (!passcode($input->safe('current_password'), $user->password)) {
+                return json([
+                    'success' => false,
+                    'errors' => ['current_password' => [__('Current password is incorrect.')]],
+                ], 401);
+            }
+
+            $user->set('password', $input->password('new_password', hash: true));
+            $user->save();
+
+            return [
+                'success' => true,
+                'message' => __('Password updated successfully.'),
+            ];
+        }
+
+        return json([
+            'success' => false,
+            'errors' => ['action' => [__('Invalid action.')]],
+        ], 400);
+    }
 }

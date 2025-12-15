@@ -1,4 +1,5 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
+import { useLocation } from "react-router";
 
 import {
   CircleGauge,
@@ -21,6 +22,8 @@ export const useApp = () => {
 };
 
 export const AppProvider = ({ children }) => {
+  const location = useLocation();
+
   const menu = {
     navMain: [
       {
@@ -78,13 +81,45 @@ export const AppProvider = ({ children }) => {
     ],
   };
 
-  const currentMenu = () => {
+  const currentMenu = useMemo(() => {
+    const path = location.pathname;
+
+    // Check main nav items
+    for (const item of menu.navMain || []) {
+      if (item.url === path) {
+        return { title: item.title, url: item.url, icon: item.icon };
+      }
+      // Check sub items
+      if (item.items) {
+        for (const subItem of item.items) {
+          if (subItem.url === path) {
+            return { title: subItem.title, url: subItem.url, icon: item.icon };
+          }
+        }
+      }
+    }
+
+    // Check documents
+    for (const item of menu.documents || []) {
+      if (item.url === path) {
+        return { title: item.name, url: item.url, icon: item.icon };
+      }
+    }
+
+    // Check secondary nav
+    for (const item of menu.navSecondary || []) {
+      if (item.url === path) {
+        return { title: item.title, url: item.url, icon: item.icon };
+      }
+    }
+
+    // Default to Dashboard
     return {
       title: "Dashboard",
       url: "/",
       icon: CircleGauge,
     };
-  };
+  }, [location.pathname]);
 
   // Context value to be provided to children components
   const value = {

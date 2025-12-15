@@ -45,7 +45,7 @@ export default function Login() {
 
     try {
       await login.mutateAsync(formData);
-      navigate(CONFIG.dashboard_root);
+      navigate(route());
     } catch (error) {
       if (error.response?.status !== 200 && error.response?.data?.errors) {
         setErrors(error.response.data.errors);

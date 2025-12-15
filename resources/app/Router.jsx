@@ -1,18 +1,19 @@
-import { Route, Routes, Navigate } from "react-router";
+import { Route, Routes } from "react-router";
 
 import ProtectedRoute from "./guards/authenticated";
 import GuestRoute from "./guards/guest";
 import DashboardLayout from "./layouts/dashboard";
 import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
-import Settings from "./pages/settings";
+import Profile from "./pages/profile";
+import NotFound from "./pages/not-found";
 
 const Router = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route
-        path="/login"
+        path={route("login")}
         element={
           <GuestRoute>
             <Login />
@@ -27,9 +28,12 @@ const Router = () => {
             <DashboardLayout />
           </ProtectedRoute>
         }
+        path={route()}
       >
         <Route index element={<Dashboard />} />
-        <Route path="settings" element={<Settings />} />
+        <Route path="profile" element={<Profile />} />
+
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );

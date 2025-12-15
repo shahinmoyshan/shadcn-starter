@@ -9,5 +9,6 @@ Route::group(['path' => '/auth', 'callback' => AuthController::class, 'middlewar
 
 Route::group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/profile', [AuthController::class, 'profile']);
 })
     ->middleware(['auth']);

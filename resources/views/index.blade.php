@@ -13,10 +13,11 @@
         const CONFIG = @json([
             'csrf_token' => csrf_token(),
             'api_base_url' => home_url('/api'),
-            'dashboard_root' => '/',
+            'dashboard_prefix' => '/',
             'user' => is_logged() ? user()->toArray() : null,
             'app' => [
                 'name' => env('app.name', 'TinyMVC App'),
+                'home_url' => home_url('/'),
             ],
         ]);
     </script>

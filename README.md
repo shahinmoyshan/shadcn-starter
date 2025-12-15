@@ -1,70 +1,104 @@
-# TinyMVC Framework
+# Php + React + Shadcn Starter
 
-[![Latest Version](https://img.shields.io/github/v/release/tinymvc/tinymvc?style=flat-square)](https://github.com/tinymvc/tinymvc/releases)
-[![License](https://img.shields.io/github/license/tinymvc/tinymvc?style=flat-square)](https://github.com/tinymvc/tinymvc/blob/main/LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/tinymvc/tinymvc?style=flat-square)](https://github.com/tinymvc/tinymvc/stargazers)
-[![Open Issues](https://img.shields.io/github/issues-raw/tinymvc/tinymvc?style=flat-square)](https://github.com/tinymvc/issues)
+A modern full-stack starter template combining TinyMVC PHP framework with React and Shadcn UI components.
 
-**A minimalist MVC PHP framework for modern web artisans**  
-Lightning-fast · Elegant Syntax · Developer Friendly
+## Features
 
-## Key Features
+- **TinyMVC Framework** - Lightweight MVC PHP framework
+- **React 18** - Modern React with hooks
+- **Shadcn UI** - Beautiful and accessible components
+- **Vite** - Lightning-fast build tool
+- **Authentication** - Built-in auth system with middleware
+- **API Ready** - RESTful API routes
+- **Database Migrations** - Version control for your database
 
-- **MVC Architecture** - Clean separation of concerns
-- **Lightning Fast** - Minimal overhead, maximum performance
-- **Built-in ORM** - Simple ActiveRecord implementation
-- **Routing System** - RESTful routing with parameter binding
-- **Dependency Injection** - Powerful IoC container
-- **Template Engine** - PHP-based views with layout support
-- **Security First** - CSRF protection, input sanitization
-- **CLI Tools** - Built-in development server and generator commands
+## Getting Started
 
-## Installation
-
-Create a new project with Composer:
+### Installation
 
 ```bash
-composer create-project tinymvc/tinymvc myapp
+# Install PHP dependencies
+composer install
 
+# Generate application key
+php spark key:generate
+
+# Run migrations and seed database
+php spark migrate --seed
 ```
 
-Start development server:
+### Development
 
 ```bash
-cd myapp
-
+# Start PHP development server
 php spark serve
 
+# In another terminal, start Vite dev server
+npm run dev
 ```
 
-**Production Note:** Configure your web server to point to the */public* directory.
+Visit `http://localhost:8000` to see your application.
 
-## Quick Start
-```php
-<?php
+### Production
 
-use Spark\Facades\Route;
-
-Route::get('welcome/{name}', function($name) {
-    return "Welcome, $name!";
-});
-
+```bash
+# Build frontend assets
+npm run build
 ```
 
-## Documentation
+Configure your web server to point to the `public` directory.
 
-Full documentation is available at: [https://tinymvc.github.io](https://tinymvc.github.io)
+## Project Structure
 
-[![Documentation](https://img.shields.io/badge/docs-online-8A2BE2?style=for-the-badge&logo=gitbook)](https://tinymvc.github.io)
+```
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/     # Application controllers
+│   │   └── Middlewares/     # Auth, CORS, CSRF middlewares
+│   ├── Models/              # Database models
+│   └── Providers/           # Service providers
+├── bootstrap/               # Application bootstrap files
+├── database/
+│   └── migrations/          # Database migrations
+├── public/                  # Web server document root
+│   └── build/              # Compiled frontend assets
+├── resources/
+│   └── app/                # React application
+│       ├── components/     # React components & Shadcn UI
+│       ├── contexts/       # React contexts (App, Auth)
+│       ├── guards/         # Route guards
+│       ├── layouts/        # Page layouts
+│       ├── pages/          # Application pages
+│       └── lib/            # Utilities and API client
+├── routes/
+│   ├── api.php            # API routes
+│   ├── web.php            # Web routes
+│   └── commands.php       # CLI commands
+└── storage/               # Logs, cache, uploads
+```
 
-## Contributing
+## Available Commands
 
-We welcome contributions! Please:
+```bash
+# Generate application key
+php spark key:generate
 
-1. ⭐ Star the repository
-2. 🐞 Report issues [here](https://github.com/tinymvc/issues)
-3. 🛠 Submit PRs following our [contribution guidelines](https://tinymvc.github.io/contribution)
+# Run migrations
+php spark migrate
+
+# Run migrations with seed data
+php spark migrate --seed
+
+# Start development server
+php spark serve
+
+# Build frontend for production
+npm run build
+
+# Start Vite dev server
+npm run dev
+```
 
 ## License
 
-TinyMVC is open-source software licensed under the [MIT License](https://github.com/tinymvc/tinymvc/blob/main/LICENSE).
+MIT License

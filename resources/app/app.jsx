@@ -22,6 +22,13 @@ const queryClient = new QueryClient({
 axios.defaults.baseURL = CONFIG.api_base_url;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
+// Helper function to generate routes with dashboard prefix
+window.route = (path = "/") => {
+  return (
+    CONFIG.dashboard_prefix.replace(/^\/+/, "") + "/" + path.replace(/^\/+/, "")
+  );
+};
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
