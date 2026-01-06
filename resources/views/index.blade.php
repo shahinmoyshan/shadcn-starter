@@ -22,7 +22,7 @@
             'privileges' => App\Modules\Privileges::list(),
         ]);
     </script>
-    @vite('app.jsx')
+    @vite('app.tsx')
 </head>
 
 <body>
