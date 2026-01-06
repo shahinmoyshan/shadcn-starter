@@ -18,7 +18,11 @@ class User extends Model
 
     protected array $guarded = [];
     protected array $hidden = ['password'];
-    protected array $appends = ['avatar_url', 'display_name'];
+    protected array $appends = ['avatar_url', 'display_name', 'joined_at'];
+    protected array $casts = [
+        'password' => 'hashed',
+        'privileges' => 'collection',
+    ];
 
     public function getDisplayNameAttribute(): string
     {
@@ -30,6 +34,11 @@ class User extends Model
     public function getAvatarUrlAttribute(): string
     {
         return get_gravatar_url($this->attributes['email'] ?? '', 100);
+    }
+
+    public function getJoinedAtAttribute(): string
+    {
+        return carbon($this->attributes['created_at'])->toFormattedDateString();
     }
 }
 

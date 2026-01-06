@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router";
-
+import { route } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -92,10 +92,6 @@ export function NavUser({ user }) {
                   <UserCircle />
                   Profile
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />

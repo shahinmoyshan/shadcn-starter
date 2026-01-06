@@ -42,5 +42,9 @@ class AppServiceProvider
     public function boot()
     {
         // i am bootstrapping services
+        date_default_timezone_set(env('app.timezone', 'UTC'));
+
+        // register privileges to the application
+        \App\Modules\Privileges::register();
     }
 }

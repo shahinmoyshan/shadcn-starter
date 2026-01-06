@@ -7,6 +7,7 @@ import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import Profile from "./pages/profile";
 import NotFound from "./pages/not-found";
+import { route } from "@/lib/utils";
 
 const Router = () => {
   return (

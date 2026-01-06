@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\{
+    AuthController,
+    UsersController
+};
 use Spark\Facades\Route;
 
 Route::group(['path' => '/auth', 'callback' => AuthController::class, 'middleware' => ['guest']], function () {
@@ -10,5 +13,10 @@ Route::group(['path' => '/auth', 'callback' => AuthController::class, 'middlewar
 Route::group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/profile', [AuthController::class, 'profile']);
+
+    // User Routes
+    Route::resource('/users', UsersController::class)
+        ->except(['create', 'edit', 'show'])
+        ->middleware(['permission:users.browse']);
 })
     ->middleware(['auth']);

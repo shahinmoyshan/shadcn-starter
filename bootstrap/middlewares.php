@@ -15,4 +15,5 @@ return [
     'throttle' => \App\Http\Middlewares\ThrottleMiddleware::class,
     'auth' => \App\Http\Middlewares\AuthMiddleware::class,
     'guest' => \App\Http\Middlewares\GuestMiddleware::class,
+    'permission' => \App\Http\Middlewares\PermissionsMiddleware::class,
 ];

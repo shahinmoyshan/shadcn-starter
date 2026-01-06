@@ -14,6 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
+import { route } from "@/lib/utils";
 
 export default function Login() {
   const [formData, setFormData] = useState({

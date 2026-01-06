@@ -1,7 +1,8 @@
 import { createContext, useContext, useMemo } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import {
+  Users,
   CircleGauge,
   Database,
   FileText,
@@ -10,6 +11,7 @@ import {
   Settings,
   Brain,
 } from "lucide-react";
+import { useAuth } from "./auth";
 
 export const AppContext = createContext();
 
@@ -23,13 +25,36 @@ export const useApp = () => {
 
 export const AppProvider = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { canAny } = useAuth();
+
+  const filterMenuItemsByPermissions = (menuItems) => {
+    return menuItems
+      .filter((item) => !item.permission || canAny(item.permission))
+      .map((item) => {
+        if (item.items) {
+          const filteredSubmenu = item.items.filter(
+            (sub) => !sub.permission || canAny(sub.permission)
+          );
+          return { ...item, items: filteredSubmenu };
+        }
+        return item;
+      });
+  };
 
   const menu = {
-    navMain: [
+    navMain: filterMenuItemsByPermissions([
       {
         title: "Dashboard",
         url: "/",
         icon: CircleGauge,
+        permission: ["dashboard.overview"],
+      },
+      {
+        title: "Users",
+        url: "/users",
+        icon: Users,
+        permission: ["users.browse"],
       },
       {
         title: "Models",
@@ -49,19 +74,20 @@ export const AppProvider = ({ children }) => {
           },
         ],
       },
-    ],
-    navSecondary: [
+    ]),
+    navSecondary: filterMenuItemsByPermissions([
       {
         title: "Settings",
         url: "/settings",
         icon: Settings,
+        permission: ["settings.general"],
       },
       {
         title: "Get Help",
         url: "/help",
         icon: HelpCircle,
       },
-    ],
+    ]),
     documents: [
       {
         name: "Data Library",
@@ -143,10 +169,41 @@ export const AppProvider = ({ children }) => {
     };
   }, [location.pathname]);
 
+  const getFirstPermittedMenuItem = () => {
+    const allMenuItems = [...menu.navMain, ...menu.navSecondary];
+    for (const item of allMenuItems) {
+      if (!item.permission || canAny(item.permission)) {
+        if (item.items) {
+          for (const subItem of item.items) {
+            if (
+              subItem.url &&
+              (!subItem.permission || canAny(subItem.permission))
+            ) {
+              return subItem.url;
+            }
+          }
+        }
+
+        if (item.url) return item.url;
+      }
+    }
+    return null; // No permitted menu item found
+  };
+
+  const redirectToFirstPermittedMenuItem = () => {
+    const firstPermittedMenuItem = getFirstPermittedMenuItem();
+    if (firstPermittedMenuItem) {
+      navigate(firstPermittedMenuItem);
+      return;
+    }
+    return false;
+  };
+
   // Context value to be provided to children components
   const value = {
     menu,
     currentMenu,
+    redirectToFirstMenu: redirectToFirstPermittedMenuItem,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

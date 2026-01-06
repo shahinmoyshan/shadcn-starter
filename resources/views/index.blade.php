@@ -19,6 +19,7 @@
                 'name' => env('app.name', 'TinyMVC App'),
                 'home_url' => home_url('/'),
             ],
+            'privileges' => App\Modules\Privileges::list(),
         ]);
     </script>
     @vite('app.jsx')

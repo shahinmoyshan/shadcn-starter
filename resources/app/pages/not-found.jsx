@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/empty";
 
 import { Link } from "react-router";
+import { route } from "@/lib/utils";
 
 export default function NotFound() {
   return (

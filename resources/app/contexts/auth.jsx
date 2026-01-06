@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { auth } from "@/lib/api";
@@ -55,6 +55,22 @@ export function AuthProvider({ children }) {
     return user && user.id > 0;
   };
 
+  const can = (permission) => {
+    if (!isAuthenticated()) return false;
+    return user.privileges && user.privileges.includes(permission);
+  };
+
+  const canAny = (permissions) => {
+    if (!isAuthenticated()) return false;
+    return permissions.some(
+      (permission) => user.privileges && user.privileges.includes(permission)
+    );
+  };
+
+  const cannot = (permission) => {
+    return !can(permission);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -63,6 +79,9 @@ export function AuthProvider({ children }) {
         login,
         logout,
         isAuthenticated,
+        can,
+        canAny,
+        cannot,
         isLoading,
         setIsLoading,
       }}

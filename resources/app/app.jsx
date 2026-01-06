@@ -2,8 +2,7 @@ import "./app.css";
 
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import axios from "axios";
-import Router from "./Router";
+import Router from "./router";
 import { AppProvider } from "./contexts/app";
 import { AuthProvider } from "./contexts/auth";
 import { ThemeProvider } from "next-themes";
@@ -18,26 +17,15 @@ const queryClient = new QueryClient({
   },
 });
 
-// Configure axios defaults
-axios.defaults.baseURL = CONFIG.api_base_url;
-axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-
-// Helper function to generate routes with dashboard prefix
-window.route = (path = "/") => {
-  return (
-    CONFIG.dashboard_prefix.replace(/^\/+/, "") + "/" + path.replace(/^\/+/, "")
-  );
-};
-
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <AppProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <AppProvider>
             <Router />
-          </AuthProvider>
-        </AppProvider>
+          </AppProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   </BrowserRouter>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -12,8 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth";
-import { profile } from "@/lib/api";
-import { toast } from "sonner";
+import { useUpdateProfile, useUpdatePassword } from "@/lib/queries";
 import { Loader2, User, Lock, AlertCircle, EyeOff, Eye } from "lucide-react";
 
 export default function Profile() {
@@ -39,11 +37,9 @@ export default function Profile() {
   const [passwordErrors, setPasswordErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  // General info mutation
-  const generalMutation = useMutation({
-    mutationFn: (data) => profile.updateGeneral(data),
+  // Use centralized query hooks with error handling
+  const generalMutation = useUpdateProfile({
     onSuccess: (response) => {
-      toast.success(response.data.message || "Profile updated successfully");
       setGeneralErrors({});
       if (response.data.user) {
         setUser(response.data.user);
@@ -60,11 +56,8 @@ export default function Profile() {
     },
   });
 
-  // Password mutation
-  const passwordMutation = useMutation({
-    mutationFn: (data) => profile.updatePassword(data),
-    onSuccess: (response) => {
-      toast.success(response.data.message || "Password updated successfully");
+  const passwordMutation = useUpdatePassword({
+    onSuccess: () => {
       setPasswordErrors({});
       setPasswordForm({
         current_password: "",
