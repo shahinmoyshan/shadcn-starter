@@ -26,7 +26,7 @@ class User extends Model
 
     public function getDisplayNameAttribute(): string
     {
-        return isset($this->attributes['first_name'])
+        return !empty($this->attributes['first_name'])
             ? trim($this->attributes['first_name'] . ' ' . ($this->attributes['last_name'] ?? ''))
             : $this->attributes['username'];
     }

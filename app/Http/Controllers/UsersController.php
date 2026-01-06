@@ -24,16 +24,18 @@ class UsersController extends Controller
     {
         authorize('permission', 'users.create');
 
-        $input = $request->validate([
-            'first_name' => 'max:50',
-            'last_name' => 'max:50',
-            'privileges' => 'required|array|min:1|max:500',
-            'email' => 'required|email|max:60|unique:users,email',
-            'username' => 'required|max:60|unique:users,username',
-            'password' => 'required|min:6|confirmed',
-        ]);
+        $user = User::create(
+            $request->validate([
+                'first_name' => 'max:50',
+                'last_name' => 'max:50',
+                'privileges' => 'required|array|min:1|max:500',
+                'email' => 'required|email|max:60|unique:users,email',
+                'username' => 'required|max:60|unique:users,username',
+                'password' => 'required|min:6|confirmed',
+            ])
+        );
 
-        if (User::create($input)) {
+        if ($user->isNewlyCreated()) {
             return [
                 'success' => true,
                 'message' => 'User created successfully.',
@@ -60,8 +62,9 @@ class UsersController extends Controller
         ]);
 
         $user = User::findOrFail($id);
+        $user->fill($input->filter());
 
-        if ($user->fill($input->filter())->save()) {
+        if ($user->save()) {
             return [
                 'success' => true,
                 'message' => 'User updated successfully.',
