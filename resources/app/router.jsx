@@ -7,6 +7,7 @@ import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import Profile from "./pages/profile";
 import NotFound from "./pages/not-found";
+import Users from "./pages/users";
 import { route } from "@/lib/utils";
 
 const Router = () => {
@@ -33,6 +34,7 @@ const Router = () => {
       >
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="users" element={<Users />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>

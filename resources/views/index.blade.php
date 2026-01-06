@@ -14,7 +14,7 @@
             'csrf_token' => csrf_token(),
             'api_base_url' => home_url('/api'),
             'dashboard_prefix' => '/',
-            'user' => is_logged() ? user()->toArray() : null,
+            'user' => user()?->toArray(),
             'app' => [
                 'name' => env('app.name', 'TinyMVC App'),
                 'home_url' => home_url('/'),

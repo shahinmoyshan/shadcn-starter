@@ -26,7 +26,7 @@ export default function DashboardLayout() {
           </div>
         </SidebarInset>
       </SidebarProvider>
-      <Toaster />
+      <Toaster position="top-center" />
     </>
   );
 }
