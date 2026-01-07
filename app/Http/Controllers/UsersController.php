@@ -35,7 +35,7 @@ class UsersController extends Controller
             ])
         );
 
-        if ($user->isNewlyCreated()) {
+        if ($user->wasNewlyCreated()) {
             return [
                 'success' => true,
                 'message' => 'User created successfully.',

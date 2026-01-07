@@ -26,9 +26,11 @@ class User extends Model
 
     public function getDisplayNameAttribute(): string
     {
-        return !empty($this->attributes['first_name'])
-            ? trim($this->attributes['first_name'] . ' ' . ($this->attributes['last_name'] ?? ''))
-            : $this->attributes['username'];
+        if (!empty($this->attributes['first_name'])) {
+            return trim($this->attributes['first_name'] . ' ' . ($this->attributes['last_name'] ?? ''));
+        }
+
+        return $this->attributes['username'];
     }
 
     public function getAvatarUrlAttribute(): string

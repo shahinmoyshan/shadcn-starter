@@ -45,5 +45,12 @@ class Privileges
                 ->intersect((array) $privileges)
                 ->isNotEmpty()
         );
+
+        Gate::define(
+            'permission:all',
+            fn(array $privileges) => user('privileges')
+                ->intersect($privileges)
+                ->count() === count($privileges)
+        );
     }
 }

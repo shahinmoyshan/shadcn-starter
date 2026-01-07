@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Modules\Privileges;
 
 return new class {
     public function up(): void
@@ -9,8 +10,8 @@ return new class {
             ['username' => 'admin'],
             [
                 'email' => 'admin@mail.com',
-                'password' => passcode('password'),
-                'privileges' => \App\Modules\Privileges::list(false)->dot()->keys(),
+                'password' => 'password',
+                'privileges' => Privileges::list(false)->dot()->keys(),
             ]
         );
     }
