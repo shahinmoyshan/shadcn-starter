@@ -145,7 +145,10 @@ export default function Login() {
                 name="remember_me"
                 checked={formData.remember_me}
                 onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, remember_me: checked as boolean }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    remember_me: checked as boolean,
+                  }))
                 }
                 disabled={login.isPending}
               />

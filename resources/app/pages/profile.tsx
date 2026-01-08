@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth";
 import { useUpdateProfile, useUpdatePassword } from "@/lib/queries";
 import { Loader2, User, Lock, AlertCircle, EyeOff, Eye } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Profile() {
   const { user, setUser } = useAuth();
@@ -33,8 +34,12 @@ export default function Profile() {
   });
 
   // Error states
-  const [generalErrors, setGeneralErrors] = useState<Record<string, string[] | string | null>>({});
-  const [passwordErrors, setPasswordErrors] = useState<Record<string, string[] | string | null>>({});
+  const [generalErrors, setGeneralErrors] = useState<
+    Record<string, string[] | string | null>
+  >({});
+  const [passwordErrors, setPasswordErrors] = useState<
+    Record<string, string[] | string | null>
+  >({});
   const [showPassword, setShowPassword] = useState(false);
 
   // Use centralized query hooks with error handling
@@ -42,11 +47,15 @@ export default function Profile() {
     onSuccess: (response) => {
       setGeneralErrors({});
       if (response.data.user) {
+        toast.success(response.data.message || "Profile updated successfully");
         setUser(response.data.user);
       }
     },
     onError: (error) => {
       if (error.response?.data?.errors) {
+        toast.error(
+          error.response?.data?.message || "Please fix the errors and try again"
+        );
         setGeneralErrors(error.response.data.errors);
       } else {
         setGeneralErrors({
@@ -57,13 +66,14 @@ export default function Profile() {
   });
 
   const passwordMutation = useUpdatePassword({
-    onSuccess: () => {
+    onSuccess: (response) => {
       setPasswordErrors({});
       setPasswordForm({
         current_password: "",
         password: "",
         password_confirmation: "",
       });
+      toast.success(response.data.message || "Password updated successfully");
     },
     onError: (error) => {
       if (error.response?.data?.errors) {
@@ -73,6 +83,9 @@ export default function Profile() {
           general: error.response?.data?.message || "Failed to update password",
         });
       }
+      toast.error(
+        error.response?.data?.message || "Please fix the errors and try again"
+      );
     },
   });
 
@@ -360,10 +373,7 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="password_confirmation"
-                    className="block mb-2"
-                  >
+                  <Label htmlFor="password_confirmation" className="block mb-2">
                     Confirm New Password{" "}
                     <sup className="text-destructive">*</sup>
                   </Label>

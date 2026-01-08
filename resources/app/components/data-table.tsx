@@ -134,7 +134,9 @@ const columns: ColumnDef<DataItem>[] = [
   {
     id: "drag",
     header: () => null,
-    cell: ({ row }: { row: Row<DataItem> }) => <DragHandle id={row.original.id} />,
+    cell: ({ row }: { row: Row<DataItem> }) => (
+      <DragHandle id={row.original.id} />
+    ),
   },
   {
     id: "select",
@@ -334,7 +336,9 @@ export function DataTable({ data: initialData }: { data: DataItem[] }) {
   const [data, setData] = React.useState<DataItem[]>(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -347,7 +351,10 @@ export function DataTable({ data: initialData }: { data: DataItem[] }) {
     useSensor(KeyboardSensor, {})
   );
 
-  const dataIds = React.useMemo(() => data?.map(({ id }: DataItem) => id) || [], [data]);
+  const dataIds = React.useMemo(
+    () => data?.map(({ id }: DataItem) => id) || [],
+    [data]
+  );
 
   const table = useReactTable({
     data,

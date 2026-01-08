@@ -12,7 +12,12 @@ import {
   Brain,
 } from "lucide-react";
 import { useAuth } from "./auth";
-import type { AppContextValue, MenuItem, Menu, CurrentMenu } from "@/types/context";
+import type {
+  AppContextValue,
+  MenuItem,
+  Menu,
+  CurrentMenu,
+} from "@/types/context";
 
 export const AppContext = createContext<AppContextValue | null>(null);
 
@@ -130,7 +135,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (item.items) {
         for (const subItem of item.items) {
           if (subItem.url === path) {
-            return { title: subItem.title, url: subItem.url, icon: item.icon || null };
+            return {
+              title: subItem.title,
+              url: subItem.url,
+              icon: item.icon || null,
+            };
           }
         }
       }
@@ -154,9 +163,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     for (const item of menu.hidden || []) {
       if (
         item.url === path ||
-        (item.url && item.url.includes(":") && path.startsWith(item.url.split("/:")[0] || ""))
+        (item.url &&
+          item.url.includes(":") &&
+          path.startsWith(item.url.split("/:")[0] || ""))
       ) {
-        return { title: item.title, url: item.url || "/", icon: item.icon || null };
+        return {
+          title: item.title,
+          url: item.url || "/",
+          icon: item.icon || null,
+        };
       }
     }
 

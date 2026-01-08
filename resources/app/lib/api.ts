@@ -35,8 +35,7 @@ export const auth = {
   ): Promise<AxiosResponse<ApiResponse<AuthResponse>>> =>
     axios.post("/auth/login", data),
 
-  logout: (): Promise<AxiosResponse<ApiResponse>> =>
-    axios.post("/auth/logout"),
+  logout: (): Promise<AxiosResponse<ApiResponse>> => axios.post("/auth/logout"),
 };
 
 // Users API endpoints

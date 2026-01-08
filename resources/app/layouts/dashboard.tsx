@@ -9,10 +9,12 @@ export default function DashboardLayout() {
     <>
       <SidebarProvider
         className="h-screen overflow-hidden"
-        style={{
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties}
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
       >
         <AppSidebar variant="inset" />
         <SidebarInset className="flex flex-col overflow-hidden">

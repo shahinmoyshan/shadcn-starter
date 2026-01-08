@@ -80,7 +80,8 @@ export function Notifications() {
   ];
 
   const [open, setOpen] = useState(false);
-  const [notificationList, setNotificationList] = useState<Notification[]>(notifications);
+  const [notificationList, setNotificationList] =
+    useState<Notification[]>(notifications);
   const unreadCount = notificationList.filter((n) => !n.read).length;
 
   const handleMarkAllAsRead = () => {

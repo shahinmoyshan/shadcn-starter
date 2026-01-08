@@ -11,14 +11,16 @@ import {
 } from "@/components/ui/sidebar";
 import { MenuItem } from "@/types/context";
 
-interface NavSecondaryProps extends React.ComponentPropsWithoutRef<typeof SidebarGroup> {
+interface NavSecondaryProps
+  extends React.ComponentPropsWithoutRef<typeof SidebarGroup> {
   items: MenuItem[];
 }
 
 export function NavSecondary({ items, ...props }: NavSecondaryProps) {
   const location = useLocation();
 
-  const isActive = (url?: string): boolean => !!url && location.pathname === url;
+  const isActive = (url?: string): boolean =>
+    !!url && location.pathname === url;
 
   return (
     <SidebarGroup {...props}>

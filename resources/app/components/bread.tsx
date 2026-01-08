@@ -73,7 +73,9 @@ interface BreadConfig {
     edit?: string;
   };
   recordCallback: (record: Record<string, unknown>) => Record<string, unknown>;
-  submitCallback: (formData: Record<string, unknown>) => Record<string, unknown>;
+  submitCallback: (
+    formData: Record<string, unknown>
+  ) => Record<string, unknown>;
   translations?: {
     add_record?: string;
     delete?: string;
@@ -89,11 +91,16 @@ interface BreadDrawerProps {
   onClose: () => void;
   record: Record<string, unknown> | null;
   createMutation: UseMutationResult<ApiResponse, AxiosError, unknown> | null;
-  updateMutation: UseMutationResult<ApiResponse, AxiosError, { id: number; data: unknown }> | null;
+  updateMutation: UseMutationResult<
+    ApiResponse,
+    AxiosError,
+    { id: number; data: unknown }
+  > | null;
   FormFields: React.ComponentType<{
     formData: Record<string, unknown>;
     isEdit: boolean;
     handleChange: (field: string, value: unknown) => void;
+    formErrors: Record<string, string[]>;
   }>;
   config: BreadConfig;
   cannot: (permission: string) => boolean;
@@ -111,11 +118,18 @@ interface BreadProps<TData = Record<string, unknown>> {
     formData: Record<string, unknown>;
     isEdit: boolean;
     handleChange: (field: string, value: unknown) => void;
+    formErrors: Record<string, string[]>;
   }>;
-  fetchMutation: (params: QueryParams) => UseQueryResult<PaginatedResponse<TData>, AxiosError>;
+  fetchMutation: (
+    params: QueryParams
+  ) => UseQueryResult<PaginatedResponse<TData>, AxiosError>;
   deleteMutation: UseMutationResult<ApiResponse, AxiosError, number>;
   createMutation: UseMutationResult<ApiResponse, AxiosError, unknown>;
-  updateMutation: UseMutationResult<ApiResponse, AxiosError, { id: number; data: unknown }>;
+  updateMutation: UseMutationResult<
+    ApiResponse,
+    AxiosError,
+    { id: number; data: unknown }
+  >;
 }
 
 interface QueryParams {
@@ -138,12 +152,36 @@ const BreadDrawer = React.memo<BreadDrawerProps>(
   }) => {
     const isMobile = useIsMobile();
     const [formData, setFormData] = React.useState(config.defaultForm);
+    const [formErrors, setFormErrors] = React.useState<
+      Record<string, string[]>
+    >({});
     const isSubmitting =
       (createMutation && createMutation.isPending) ||
       (updateMutation && updateMutation.isPending);
 
+    // Extract errors from mutation results
+    React.useEffect(() => {
+      const activeMutation = record ? updateMutation : createMutation;
+      if (activeMutation?.error) {
+        const axiosError = activeMutation.error as AxiosError<ApiResponse>;
+        const errors = axiosError.response?.data?.errors;
+        if (errors) {
+          setFormErrors(errors);
+        }
+      } else if (activeMutation?.isSuccess) {
+        setFormErrors({});
+      }
+    }, [
+      createMutation?.error,
+      updateMutation?.error,
+      createMutation?.isSuccess,
+      updateMutation?.isSuccess,
+      record,
+    ]);
+
     React.useEffect(() => {
       if (isOpen) {
+        setFormErrors({}); // Clear errors when drawer opens
         if (record) {
           setFormData(config.recordCallback(record));
         } else {
@@ -153,7 +191,10 @@ const BreadDrawer = React.memo<BreadDrawerProps>(
     }, [record, isOpen]);
 
     const handleChange = React.useCallback((field: string, value: unknown) => {
-      setFormData((prev: Record<string, unknown>) => ({ ...prev, [field]: value }));
+      setFormData((prev: Record<string, unknown>) => ({
+        ...prev,
+        [field]: value,
+      }));
     }, []);
 
     const handleSubmit = React.useCallback(
@@ -202,12 +243,17 @@ const BreadDrawer = React.memo<BreadDrawerProps>(
             formData={formData}
             isEdit={!!record}
             handleChange={handleChange}
+            formErrors={formErrors}
           />
         </div>
 
         <div className="px-4 py-4 border-t mt-auto shrink-0">
           <div className="flex gap-2">
-            <Button type="submit" disabled={isSubmitting || false} className="flex-1">
+            <Button
+              type="submit"
+              disabled={isSubmitting || false}
+              className="flex-1"
+            >
               {isSubmitting ? "Saving..." : record ? "Update" : "Create"}
             </Button>
             <Button
@@ -250,7 +296,9 @@ const BreadDrawer = React.memo<BreadDrawerProps>(
   }
 );
 
-export default function Bread<TData extends Record<string, unknown> = Record<string, unknown>>({
+export default function Bread<
+  TData extends Record<string, unknown> = Record<string, unknown>
+>({
   config,
   columnsCallback,
   FormFields,
@@ -266,9 +314,13 @@ export default function Bread<TData extends Record<string, unknown> = Record<str
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [selectedRecord, setSelectedRecord] = React.useState<TData | null>(null);
+  const [selectedRecord, setSelectedRecord] = React.useState<TData | null>(
+    null
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [recordToDelete, setRecordToDelete] = React.useState<number | null>(null);
+  const [recordToDelete, setRecordToDelete] = React.useState<number | null>(
+    null
+  );
 
   const { can, cannot } = useAuth();
 
@@ -335,10 +387,13 @@ export default function Bread<TData extends Record<string, unknown> = Record<str
     setDrawerOpen(true);
   }, []);
 
-  const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, []);
+  const handleSearchChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    },
+    []
+  );
 
   const handlePageSizeChange = React.useCallback((value: string) => {
     setPagination({

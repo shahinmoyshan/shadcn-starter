@@ -186,7 +186,8 @@ function ChartTooltipContent({
       <div className="grid gap-1.5">
         {payload
           .filter(
-            (item: { type?: string }): item is typeof item => item.type !== "none"
+            (item: { type?: string }): item is typeof item =>
+              item.type !== "none"
           )
           .map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;

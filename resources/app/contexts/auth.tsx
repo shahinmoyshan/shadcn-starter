@@ -6,7 +6,6 @@ import { auth } from "@/lib/api";
 import type { ApiResponse, LoginCredentials, AuthResponse } from "@/types/api";
 import { AuthContextValue } from "@/types/context";
 
-
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -19,7 +18,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     AxiosError<ApiResponse>,
     LoginCredentials
   >({
-    mutationFn: async ({ user, password, remember_me = false }: LoginCredentials) => {
+    mutationFn: async ({
+      user,
+      password,
+      remember_me = false,
+    }: LoginCredentials) => {
       const response = await auth.login({
         user,
         password,

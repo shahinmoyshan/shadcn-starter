@@ -62,7 +62,7 @@ class AuthController extends Controller
             'username' => 'required_if:action,general|string|min:4|max:50|unique:users,username,' . user('id'),
             'email' => 'required_if:action,general|email|max:100|unique:users,email,' . user('id'),
             'current_password' => 'required_if:action,password|string|min:8|max:100',
-            'new_password' => 'required_if:action,password|string|min:8|max:100|confirmed',
+            'password' => 'required_if:action,password|string|min:8|max:100|confirmed',
         ]);
 
         $user = user();
@@ -83,7 +83,7 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            $user->set('password', $input->password('new_password', hash: true));
+            $user->set('password', $input->password(hash: true));
             $user->save();
 
             return [

@@ -1,7 +1,13 @@
 "use client";
 
 import { useLocation, Link } from "react-router";
-import { MoreHorizontal, Folder, Share2, Trash2, type LucideIcon } from "lucide-react";
+import {
+  MoreHorizontal,
+  Folder,
+  Share2,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
 
 import {
   DropdownMenu,

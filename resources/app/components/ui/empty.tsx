@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Empty = React.forwardRef<
   HTMLDivElement,
@@ -14,7 +14,8 @@ const Empty = React.forwardRef<
       "flex min-w-0 flex-1 flex-col items-center justify-center gap-6 rounded-lg border-dashed p-6 text-center text-balance md:p-12",
       className
     )}
-    {...props} />
+    {...props}
+  />
 ));
 Empty.displayName = "Empty";
 
@@ -25,8 +26,12 @@ const EmptyHeader = React.forwardRef<
   <div
     ref={ref}
     data-slot="empty-header"
-    className={cn("flex max-w-sm flex-col items-center gap-2 text-center", className)}
-    {...props} />
+    className={cn(
+      "flex max-w-sm flex-col items-center gap-2 text-center",
+      className
+    )}
+    {...props}
+  />
 ));
 EmptyHeader.displayName = "EmptyHeader";
 
@@ -43,7 +48,7 @@ const emptyMediaVariants = cva(
       variant: "default",
     },
   }
-)
+);
 
 const EmptyMedia = React.forwardRef<
   HTMLDivElement,
@@ -54,7 +59,8 @@ const EmptyMedia = React.forwardRef<
     data-slot="empty-icon"
     data-variant={variant}
     className={cn(emptyMediaVariants({ variant, className }))}
-    {...props} />
+    {...props}
+  />
 ));
 EmptyMedia.displayName = "EmptyMedia";
 
@@ -66,7 +72,8 @@ const EmptyTitle = React.forwardRef<
     ref={ref}
     data-slot="empty-title"
     className={cn("text-lg font-medium tracking-tight", className)}
-    {...props} />
+    {...props}
+  />
 ));
 EmptyTitle.displayName = "EmptyTitle";
 
@@ -81,7 +88,8 @@ const EmptyDescription = React.forwardRef<
       "text-muted-foreground [&>a:hover]:text-primary text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4",
       className
     )}
-    {...props} />
+    {...props}
+  />
 ));
 EmptyDescription.displayName = "EmptyDescription";
 
@@ -96,7 +104,8 @@ const EmptyContent = React.forwardRef<
       "flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance",
       className
     )}
-    {...props} />
+    {...props}
+  />
 ));
 EmptyContent.displayName = "EmptyContent";
 
@@ -107,4 +116,4 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
-}
+};

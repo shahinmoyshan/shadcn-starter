@@ -49,7 +49,12 @@ export function DateTimePicker({
 
     const [hours, minutes] = timeValue.split(":");
     const newDate = new Date(date);
-    newDate.setHours(parseInt(hours || "0", 10), parseInt(minutes || "0", 10), 0, 0);
+    newDate.setHours(
+      parseInt(hours || "0", 10),
+      parseInt(minutes || "0", 10),
+      0,
+      0
+    );
 
     setSelectedDate(newDate);
 
@@ -65,7 +70,12 @@ export function DateTimePicker({
     if (selectedDate) {
       const [hours, minutes] = newTime.split(":");
       const newDate = new Date(selectedDate);
-      newDate.setHours(parseInt(hours || "0", 10), parseInt(minutes || "0", 10), 0, 0);
+      newDate.setHours(
+        parseInt(hours || "0", 10),
+        parseInt(minutes || "0", 10),
+        0,
+        0
+      );
 
       setSelectedDate(newDate);
 

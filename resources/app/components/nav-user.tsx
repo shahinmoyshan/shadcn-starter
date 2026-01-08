@@ -1,9 +1,4 @@
-import {
-  MoreVertical,
-  LogOut,
-  Bell,
-  UserCircle,
-} from "lucide-react";
+import { MoreVertical, LogOut, Bell, UserCircle } from "lucide-react";
 
 import { Link } from "react-router";
 import { route } from "@/lib/utils";

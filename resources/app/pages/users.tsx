@@ -35,6 +35,7 @@ interface FormFieldsProps {
   formData: UserFormData;
   isEdit: boolean;
   handleChange: (field: string, value: string | string[]) => void;
+  formErrors: Record<string, string[]>;
 }
 
 interface NameCellProps {
@@ -64,102 +65,104 @@ interface ColumnsCallbackParams {
 }
 
 // Privileges Box Component
-const PrivilegesBox = React.memo<PrivilegesBoxProps>(({ formData, handleChange }) => {
-  const handlePrivilegeToggle = (privilegeKey: string) => {
-    const currentPrivileges = formData.privileges || [];
-    const newPrivileges = currentPrivileges.includes(privilegeKey)
-      ? currentPrivileges.filter((p: string) => p !== privilegeKey)
-      : [...currentPrivileges, privilegeKey];
-    handleChange("privileges", newPrivileges);
-  };
+const PrivilegesBox = React.memo<PrivilegesBoxProps>(
+  ({ formData, handleChange }) => {
+    const handlePrivilegeToggle = (privilegeKey: string) => {
+      const currentPrivileges = formData.privileges || [];
+      const newPrivileges = currentPrivileges.includes(privilegeKey)
+        ? currentPrivileges.filter((p: string) => p !== privilegeKey)
+        : [...currentPrivileges, privilegeKey];
+      handleChange("privileges", newPrivileges);
+    };
 
-  const handleGroupToggle = (groupKey: string) => {
-    const groupPermissions = Object.keys(CONFIG.privileges[groupKey] || {});
-    const currentPrivileges = formData.privileges || [];
-    const allSelected = groupPermissions.every((p) =>
-      currentPrivileges.includes(p)
-    );
+    const handleGroupToggle = (groupKey: string) => {
+      const groupPermissions = Object.keys(CONFIG.privileges[groupKey] || {});
+      const currentPrivileges = formData.privileges || [];
+      const allSelected = groupPermissions.every((p) =>
+        currentPrivileges.includes(p)
+      );
 
-    const newPrivileges = allSelected
-      ? currentPrivileges.filter((p: string) => !groupPermissions.includes(p))
-      : [...new Set([...currentPrivileges, ...groupPermissions])];
-    handleChange("privileges", newPrivileges);
-  };
+      const newPrivileges = allSelected
+        ? currentPrivileges.filter((p: string) => !groupPermissions.includes(p))
+        : [...new Set([...currentPrivileges, ...groupPermissions])];
+      handleChange("privileges", newPrivileges);
+    };
 
-  return (
-    <div className="space-y-4">
-      <Label className="block mb-2">Privileges</Label>
-      <div className="space-y-3">
-        {Object.entries(CONFIG.privileges).map(([groupKey, permissions]) => {
-          const groupPermissions = Object.keys(permissions);
-          const currentPrivileges = formData.privileges || [];
-          const allSelected = groupPermissions.every((p) =>
-            currentPrivileges.includes(p)
-          );
-          const someSelected =
-            groupPermissions.some((p) => currentPrivileges.includes(p)) &&
-            !allSelected;
+    return (
+      <div className="space-y-4">
+        <Label className="block mb-2">Privileges</Label>
+        <div className="space-y-3">
+          {Object.entries(CONFIG.privileges).map(([groupKey, permissions]) => {
+            const groupPermissions = Object.keys(permissions);
+            const currentPrivileges = formData.privileges || [];
+            const allSelected = groupPermissions.every((p) =>
+              currentPrivileges.includes(p)
+            );
+            const someSelected =
+              groupPermissions.some((p) => currentPrivileges.includes(p)) &&
+              !allSelected;
 
-          return (
-            <div
-              key={groupKey}
-              className="rounded-lg border bg-card text-card-foreground shadow-xs"
-            >
-              <div className="p-3 pb-3">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id={`group-${groupKey}`}
-                    checked={allSelected}
-                    onCheckedChange={() => handleGroupToggle(groupKey)}
-                    className={
-                      someSelected
-                        ? "data-[state=checked]:bg-muted-foreground"
-                        : ""
-                    }
-                  />
-                  <Label
-                    htmlFor={`group-${groupKey}`}
-                    className="text-sm font-semibold cursor-pointer"
-                  >
-                    {headline(groupKey)}
-                  </Label>
+            return (
+              <div
+                key={groupKey}
+                className="rounded-lg border bg-card text-card-foreground shadow-xs"
+              >
+                <div className="p-3 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id={`group-${groupKey}`}
+                      checked={allSelected}
+                      onCheckedChange={() => handleGroupToggle(groupKey)}
+                      className={
+                        someSelected
+                          ? "data-[state=checked]:bg-muted-foreground"
+                          : ""
+                      }
+                    />
+                    <Label
+                      htmlFor={`group-${groupKey}`}
+                      className="text-sm font-semibold cursor-pointer"
+                    >
+                      {headline(groupKey)}
+                    </Label>
+                  </div>
                 </div>
-              </div>
-              <div className="px-4 pb-4 pt-0">
-                <div className="space-y-3 pl-5">
-                  {Object.entries(permissions).map(
-                    ([permissionKey, permissionLabel]) => (
-                      <div
-                        key={permissionKey}
-                        className="flex items-center gap-2"
-                      >
-                        <Checkbox
-                          id={permissionKey}
-                          checked={(formData.privileges || []).includes(
-                            permissionKey
-                          )}
-                          onCheckedChange={() =>
-                            handlePrivilegeToggle(permissionKey)
-                          }
-                        />
-                        <Label
-                          htmlFor={permissionKey}
-                          className="text-[0.81rem] font-normal cursor-pointer"
+                <div className="px-4 pb-4 pt-0">
+                  <div className="space-y-3 pl-5">
+                    {Object.entries(permissions).map(
+                      ([permissionKey, permissionLabel]) => (
+                        <div
+                          key={permissionKey}
+                          className="flex items-center gap-2"
                         >
-                          {permissionLabel}
-                        </Label>
-                      </div>
-                    )
-                  )}
+                          <Checkbox
+                            id={permissionKey}
+                            checked={(formData.privileges || []).includes(
+                              permissionKey
+                            )}
+                            onCheckedChange={() =>
+                              handlePrivilegeToggle(permissionKey)
+                            }
+                          />
+                          <Label
+                            htmlFor={permissionKey}
+                            className="text-[0.81rem] font-normal cursor-pointer"
+                          >
+                            {permissionLabel}
+                          </Label>
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 const privilegeLabel = (key: string): string => {
   for (const group of Object.values(CONFIG.privileges)) {
@@ -171,103 +174,126 @@ const privilegeLabel = (key: string): string => {
 };
 
 // Memoized form fields component
-const FormFields = React.memo<FormFieldsProps>(({ formData, isEdit, handleChange }) => (
-  <div className="space-y-4 pb-4">
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="name" className="block mb-2">
-          First Name
-        </Label>
-        <Input
-          id="name"
-          value={formData.first_name}
-          onChange={(e) => handleChange("first_name", e.target.value)}
-          placeholder="Enter first name"
-          maxLength={100}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="name" className="block mb-2">
-          Last Name
-        </Label>
-        <Input
-          id="name"
-          value={formData.last_name}
-          onChange={(e) => handleChange("last_name", e.target.value)}
-          placeholder="Enter last name"
-          maxLength={100}
-        />
-      </div>
-    </div>
-    <div className="space-y-2">
-      <Label htmlFor="username" className="block mb-2">
-        Username <sup className="text-destructive">*</sup>
-      </Label>
-      <Input
-        id="username"
-        value={formData.username}
-        onChange={(e) => handleChange("username", e.target.value)}
-        placeholder="Enter username"
-        maxLength={100}
-        required
-      />
-    </div>
-    <div className="space-y-2">
-      <Label htmlFor="email" className="block mb-2">
-        Email <sup className="text-destructive">*</sup>
-      </Label>
-      <Input
-        id="email"
-        value={formData.email}
-        onChange={(e) => handleChange("email", e.target.value)}
-        placeholder="Enter email"
-        maxLength={100}
-        required
-      />
-    </div>
-    <div>
-      {isEdit && (
-        <h2 className="text-base font-medium mb-2 ">Change Password</h2>
-      )}
+const FormFields = React.memo<FormFieldsProps>(
+  ({ formData, isEdit, handleChange, formErrors }) => (
+    <div className="space-y-4 pb-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="password" className="block mb-2">
-            Password
+          <Label htmlFor="name" className="block mb-2">
+            First Name
           </Label>
           <Input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-            placeholder="Enter password"
+            id="name"
+            value={formData.first_name}
+            onChange={(e) => handleChange("first_name", e.target.value)}
+            placeholder="Enter first name"
             maxLength={100}
           />
+          {formErrors.first_name && (
+            <p className="text-xs text-destructive">
+              {formErrors.first_name[0]}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password_confirmation" className="block mb-2">
-            Confirm Password
+          <Label htmlFor="name" className="block mb-2">
+            Last Name
           </Label>
           <Input
-            id="password_confirmation"
-            type="password"
-            value={formData.password_confirmation}
-            onChange={(e) =>
-              handleChange("password_confirmation", e.target.value)
-            }
-            placeholder="Enter confirm password"
+            id="name"
+            value={formData.last_name}
+            onChange={(e) => handleChange("last_name", e.target.value)}
+            placeholder="Enter last name"
             maxLength={100}
           />
+          {formErrors.last_name && (
+            <p className="text-xs text-destructive">
+              {formErrors.last_name[0]}
+            </p>
+          )}
         </div>
       </div>
-      {isEdit && (
-        <p className="text-xs text-muted-foreground mt-1.5">
-          Leave blank to keep current password
-        </p>
-      )}
+      <div className="space-y-2">
+        <Label htmlFor="username" className="block mb-2">
+          Username <sup className="text-destructive">*</sup>
+        </Label>
+        <Input
+          id="username"
+          value={formData.username}
+          onChange={(e) => handleChange("username", e.target.value)}
+          placeholder="Enter username"
+          maxLength={100}
+          required
+        />
+        {formErrors.username && (
+          <p className="text-xs text-destructive">{formErrors.username[0]}</p>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="email" className="block mb-2">
+          Email <sup className="text-destructive">*</sup>
+        </Label>
+        <Input
+          id="email"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          placeholder="Enter email"
+          maxLength={100}
+          required
+        />
+        {formErrors.email && (
+          <p className="text-xs text-destructive">{formErrors.email[0]}</p>
+        )}
+      </div>
+      <div>
+        {isEdit && (
+          <h2 className="text-base font-medium mb-2 ">Change Password</h2>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="block mb-2">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              placeholder="Enter password"
+              maxLength={100}
+            />
+            {formErrors.password && (
+              <p className="text-xs text-destructive">
+                {formErrors.password[0]}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password_confirmation" className="block mb-2">
+              Confirm Password
+            </Label>
+            <Input
+              id="password_confirmation"
+              type="password"
+              value={formData.password_confirmation}
+              onChange={(e) =>
+                handleChange("password_confirmation", e.target.value)
+              }
+              placeholder="Enter confirm password"
+              maxLength={100}
+            />
+          </div>
+        </div>
+        {isEdit && (
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Leave blank to keep current password
+          </p>
+        )}
+      </div>
+      <PrivilegesBox formData={formData} handleChange={handleChange} />
     </div>
-    <PrivilegesBox formData={formData} handleChange={handleChange} />
-  </div>
-));
+  )
+);
 
 // Memoized table cell components
 const NameCell = React.memo<NameCellProps>(({ row, onEdit }) => (
@@ -308,37 +334,38 @@ const PrivilegesCell = React.memo<PrivilegesCellProps>(({ privileges }) => {
   );
 });
 
-const ActionsCell = React.memo<ActionsCellProps>(({ user, onEdit, onDelete, can }) => (
-  <div className="flex justify-end">
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="">
-        {can.edit && (
-          <DropdownMenuItem onClick={() => onEdit(user)} className="" inset={false}>
-            <Pencil className="mr-1 size-4" />
-            Edit
-          </DropdownMenuItem>
-        )}
-        {can.edit && can.delete && <DropdownMenuSeparator className="" />}
-        {can.delete && (
-          <DropdownMenuItem
-            onClick={() => onDelete(user.id)}
-            className="text-destructive"
-            inset={false}
-          >
-            <Trash2 className="mr-1 size-4" />
-            Delete
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  </div>
-));
+const ActionsCell = React.memo<ActionsCellProps>(
+  ({ user, onEdit, onDelete, can }) => (
+    <div className="flex justify-end">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {can.edit && (
+            <DropdownMenuItem onClick={() => onEdit(user)}>
+              <Pencil className="mr-1 size-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
+          {can.edit && can.delete && <DropdownMenuSeparator />}
+          {can.delete && (
+            <DropdownMenuItem
+              onClick={() => onDelete(user.id)}
+              className="text-destructive"
+            >
+              <Trash2 className="mr-1 size-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  )
+);
 
 export default () =>
   Bread({
@@ -370,16 +397,27 @@ export default () =>
       }),
       submitCallback: (formData) => formData,
     },
-    columnsCallback: (({ handleEdit, handleDelete, can }: ColumnsCallbackParams) => [
+    columnsCallback: (({
+      handleEdit,
+      handleDelete,
+      can,
+    }: ColumnsCallbackParams) => [
       {
         accessorKey: "name",
         header: "Name",
-        cell: ({ row }: { row: Row<User> }) => <NameCell row={row} onEdit={handleEdit as unknown as (user: User) => void} />,
+        cell: ({ row }: { row: Row<User> }) => (
+          <NameCell
+            row={row}
+            onEdit={handleEdit as unknown as (user: User) => void}
+          />
+        ),
       },
       {
         accessorKey: "email",
         header: "Email",
-        cell: ({ row }: { row: Row<User> }) => <EmailCell email={row.original.email} />,
+        cell: ({ row }: { row: Row<User> }) => (
+          <EmailCell email={row.original.email} />
+        ),
       },
       {
         accessorKey: "privileges",
@@ -412,6 +450,7 @@ export default () =>
     ]) as any,
     FormFields: FormFields as unknown as React.ComponentType<{
       formData: Record<string, unknown>;
+      formErrors: Record<string, string[]>;
       isEdit: boolean;
       handleChange: (field: string, value: unknown) => void;
     }>,
