@@ -12,8 +12,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function DateTimePicker({ value, onChange, disabled = false }) {
-  const [selectedDate, setSelectedDate] = React.useState(
+type DateTimePickerProps = {
+  value?: string | Date;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+};
+
+export function DateTimePicker({
+  value,
+  onChange,
+  disabled = false,
+}: DateTimePickerProps) {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
     value ? new Date(value) : undefined
   );
   const [timeValue, setTimeValue] = React.useState(
@@ -34,12 +44,12 @@ export function DateTimePicker({ value, onChange, disabled = false }) {
     }
   }, [value]);
 
-  const handleDateSelect = (date) => {
+  const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
 
     const [hours, minutes] = timeValue.split(":");
     const newDate = new Date(date);
-    newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+    newDate.setHours(parseInt(hours || "0", 10), parseInt(minutes || "0", 10), 0, 0);
 
     setSelectedDate(newDate);
 
@@ -48,14 +58,14 @@ export function DateTimePicker({ value, onChange, disabled = false }) {
     onChange(formattedDate);
   };
 
-  const handleTimeChange = (e) => {
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = e.target.value;
     setTimeValue(newTime);
 
     if (selectedDate) {
       const [hours, minutes] = newTime.split(":");
       const newDate = new Date(selectedDate);
-      newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+      newDate.setHours(parseInt(hours || "0", 10), parseInt(minutes || "0", 10), 0, 0);
 
       setSelectedDate(newDate);
 

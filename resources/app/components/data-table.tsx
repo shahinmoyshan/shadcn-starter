@@ -7,6 +7,7 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
@@ -39,6 +40,12 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type ColumnDef,
+  type Row,
+  type Cell,
+  type Table as TableType,
+  type SortingState,
+  type ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { toast } from "sonner";
@@ -101,8 +108,10 @@ export const schema = z.object({
   reviewer: z.string(),
 });
 
+type DataItem = z.infer<typeof schema>;
+
 // Create a separate component for the drag handle
-function DragHandle({ id }) {
+function DragHandle({ id }: { id: number }) {
   const { attributes, listeners } = useSortable({
     id,
   });
@@ -121,15 +130,15 @@ function DragHandle({ id }) {
   );
 }
 
-const columns = [
+const columns: ColumnDef<DataItem>[] = [
   {
     id: "drag",
     header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
+    cell: ({ row }: { row: Row<DataItem> }) => <DragHandle id={row.original.id} />,
   },
   {
     id: "select",
-    header: ({ table }) => (
+    header: ({ table }: { table: TableType<DataItem> }) => (
       <div className="flex items-center justify-center">
         <Checkbox
           checked={
@@ -141,7 +150,7 @@ const columns = [
         />
       </div>
     ),
-    cell: ({ row }) => (
+    cell: ({ row }: { row: Row<DataItem> }) => (
       <div className="flex items-center justify-center">
         <Checkbox
           checked={row.getIsSelected()}
@@ -156,7 +165,7 @@ const columns = [
   {
     accessorKey: "header",
     header: "Header",
-    cell: ({ row }) => {
+    cell: ({ row }: { row: Row<DataItem> }) => {
       return <TableCellViewer item={row.original} />;
     },
     enableHiding: false,
@@ -164,7 +173,7 @@ const columns = [
   {
     accessorKey: "type",
     header: "Section Type",
-    cell: ({ row }) => (
+    cell: ({ row }: { row: Row<DataItem> }) => (
       <div className="w-32">
         <Badge variant="outline" className="text-muted-foreground px-1.5">
           {row.original.type}
@@ -175,7 +184,7 @@ const columns = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
+    cell: ({ row }: { row: Row<DataItem> }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
         {row.original.status === "Done" ? (
           <CheckCircle2 className="fill-green-500 dark:fill-green-400" />
@@ -189,7 +198,7 @@ const columns = [
   {
     accessorKey: "target",
     header: () => <div className="w-full text-right">Target</div>,
-    cell: ({ row }) => (
+    cell: ({ row }: { row: Row<DataItem> }) => (
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -214,7 +223,7 @@ const columns = [
   {
     accessorKey: "limit",
     header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
+    cell: ({ row }: { row: Row<DataItem> }) => (
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -239,7 +248,7 @@ const columns = [
   {
     accessorKey: "reviewer",
     header: "Reviewer",
-    cell: ({ row }) => {
+    cell: ({ row }: { row: Row<DataItem> }) => {
       const isAssigned = row.original.reviewer !== "Assign reviewer";
 
       if (isAssigned) {
@@ -296,7 +305,7 @@ const columns = [
   },
 ];
 
-function DraggableRow({ row }) {
+function DraggableRow({ row }: { row: Row<DataItem> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   });
@@ -312,7 +321,7 @@ function DraggableRow({ row }) {
         transition: transition,
       }}
     >
-      {row.getVisibleCells().map((cell) => (
+      {row.getVisibleCells().map((cell: Cell<DataItem, unknown>) => (
         <TableCell key={cell.id}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
@@ -321,12 +330,12 @@ function DraggableRow({ row }) {
   );
 }
 
-export function DataTable({ data: initialData }) {
-  const [data, setData] = React.useState(() => initialData);
+export function DataTable({ data: initialData }: { data: DataItem[] }) {
+  const [data, setData] = React.useState<DataItem[]>(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -338,7 +347,7 @@ export function DataTable({ data: initialData }) {
     useSensor(KeyboardSensor, {})
   );
 
-  const dataIds = React.useMemo(() => data?.map(({ id }) => id) || [], [data]);
+  const dataIds = React.useMemo(() => data?.map(({ id }: DataItem) => id) || [], [data]);
 
   const table = useReactTable({
     data,
@@ -350,7 +359,7 @@ export function DataTable({ data: initialData }) {
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row.id?.toString() ?? "",
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -365,12 +374,12 @@ export function DataTable({ data: initialData }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  function handleDragEnd(event) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
+        const oldIndex = dataIds.indexOf(active.id as number);
+        const newIndex = dataIds.indexOf(over.id as number);
         return arrayMove(data, oldIndex, newIndex);
       });
     }
@@ -623,7 +632,7 @@ const chartConfig = {
   },
 };
 
-function TableCellViewer({ item }) {
+function TableCellViewer({ item }: { item: DataItem }) {
   const isMobile = useIsMobile();
 
   return (

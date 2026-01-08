@@ -11,6 +11,10 @@ import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 
+type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+};
+
 function Calendar({
   className,
   classNames,
@@ -20,7 +24,7 @@ function Calendar({
   formatters,
   components,
   ...props
-}) {
+}: CalendarProps) {
   const defaultClassNames = getDefaultClassNames();
 
   return (
@@ -126,7 +130,13 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
+        Root: ({
+          className,
+          rootRef,
+          ...props
+        }: React.HTMLAttributes<HTMLDivElement> & {
+          rootRef?: React.Ref<HTMLDivElement>;
+        }) => {
           return (
             <div
               data-slot="calendar"
@@ -136,7 +146,13 @@ function Calendar({
             />
           );
         },
-        Chevron: ({ className, orientation, ...props }) => {
+        Chevron: ({
+          className,
+          orientation,
+          ...props
+        }: React.SVGAttributes<SVGSVGElement> & {
+          orientation?: "left" | "right" | "up" | "down";
+        }) => {
           if (orientation === "left") {
             return (
               <ChevronLeftIcon className={cn("size-4", className)} {...props} />
@@ -157,7 +173,12 @@ function Calendar({
           );
         },
         DayButton: CalendarDayButton,
-        WeekNumber: ({ children, ...props }) => {
+        WeekNumber: ({
+          children,
+          ...props
+        }: React.TdHTMLAttributes<HTMLTableCellElement> & {
+          children?: React.ReactNode;
+        }) => {
           return (
             <td {...props}>
               <div className="flex size-(--cell-size) items-center justify-center text-center">
@@ -173,19 +194,32 @@ function Calendar({
   );
 }
 
-function CalendarDayButton({ className, day, modifiers, ...props }) {
+function CalendarDayButton({
+  className,
+  day,
+  modifiers,
+  ...props
+}: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
+  day: { date: Date };
+  modifiers: {
+    focused?: boolean;
+    selected?: boolean;
+    range_start?: boolean;
+    range_end?: boolean;
+    range_middle?: boolean;
+  };
+}) {
   const defaultClassNames = getDefaultClassNames();
 
-  const ref = React.useRef(null);
+  const ref = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
 
   return (
-    <Button
+    <button
       ref={ref}
-      variant="ghost"
-      size="icon"
+      type="button"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={
         modifiers.selected &&

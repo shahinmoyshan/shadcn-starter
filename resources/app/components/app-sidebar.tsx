@@ -34,7 +34,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <Link to={CONFIG.home_url || "/"}>
+              <Link to={(CONFIG as { home_url?: string }).home_url || "/"}>
                 <Eclipse className="size-5!" />
                 <span className="text-base font-semibold">
                   {CONFIG.app.name}
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
         <NavUser
           user={{
             avatar: user?.avatar_url || null,
-            name: user?.display_name || user?.username || user?.name || "Guest",
+            name: user?.display_name || user?.username || "Guest",
             email: user?.email || "",
           }}
         />

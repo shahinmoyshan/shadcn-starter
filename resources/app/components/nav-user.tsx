@@ -1,5 +1,4 @@
 import {
-  CreditCard,
   MoreVertical,
   LogOut,
   Bell,

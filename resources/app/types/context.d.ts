@@ -66,20 +66,3 @@ export interface AppContextValue {
   currentMenu: CurrentMenu;
   redirectToFirstMenu: () => boolean | void;
 }
-
-export interface AuthContextValue {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  login: UseMutationResult<
-    ApiResponse<AuthResponse>,
-    AxiosError<ApiResponse>,
-    LoginCredentials
-  >;
-  logout: UseMutationResult<ApiResponse, AxiosError<ApiResponse>, void>;
-  isAuthenticated: () => boolean;
-  can: (permission: string) => boolean;
-  canAny: (permissions: string[]) => boolean;
-  cannot: (permission: string) => boolean;
-  isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
-}

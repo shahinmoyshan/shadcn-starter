@@ -18,7 +18,7 @@ interface NavSecondaryProps extends React.ComponentPropsWithoutRef<typeof Sideba
 export function NavSecondary({ items, ...props }: NavSecondaryProps) {
   const location = useLocation();
 
-  const isActive = (url?: string) => url && location.pathname === url;
+  const isActive = (url?: string): boolean => !!url && location.pathname === url;
 
   return (
     <SidebarGroup {...props}>

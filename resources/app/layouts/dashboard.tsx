@@ -12,11 +12,11 @@ export default function DashboardLayout() {
         style={{
           "--sidebar-width": "calc(var(--spacing) * 72)",
           "--header-height": "calc(var(--spacing) * 12)",
-        }}
+        } as React.CSSProperties}
       >
         <AppSidebar variant="inset" />
         <SidebarInset className="flex flex-col overflow-hidden">
-          <SiteHeader className="shrink-0" />
+          <SiteHeader />
           <div className="flex flex-1 flex-col overflow-hidden">
             <div className="@container/main flex flex-1 flex-col overflow-y-auto">
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

@@ -26,9 +26,9 @@ interface NavMainProps {
 export function NavMain({ items }: NavMainProps) {
   const location = useLocation();
 
-  const isActive = (url?: string) => url && location.pathname === url;
-  const hasActiveChild = (item: MenuItem) =>
-    item.items?.some((subItem) => isActive(subItem.url));
+  const isActive = (url?: string): boolean => !!url && location.pathname === url;
+  const hasActiveChild = (item: MenuItem): boolean =>
+    item.items?.some((subItem) => isActive(subItem.url)) ?? false;
 
   return (
     <SidebarGroup>
