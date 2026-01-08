@@ -169,7 +169,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [location.pathname, menu]);
 
   const getFirstPermittedMenuItem = (): string | null => {
-    const allMenuItems = [...menu.navMain, ...menu.navSecondary];
+    const allMenuItems = [...menu.navMain, ...(menu.navSecondary || [])];
     for (const item of allMenuItems) {
       if (!item.permission || canAny(item.permission)) {
         if (item.items) {

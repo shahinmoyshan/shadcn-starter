@@ -1,14 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import type { UseMutationResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import type { ApiResponse, LoginResponse } from "./api";
+import type { ApiResponse, AuthResponse } from "./api";
 
 // Auth Context Types
 export interface AuthContextValue {
   user: User | null;
   setUser: (user: User | null) => void;
   login: UseMutationResult<
-    ApiResponse<LoginResponse>,
+    ApiResponse<AuthResponse>,
     AxiosError<ApiResponse>,
     LoginCredentials,
     unknown
@@ -25,12 +25,6 @@ export interface AuthContextValue {
   cannot: (permission: string) => boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-}
-
-export interface LoginCredentials {
-  user: string;
-  password: string;
-  remember_me?: boolean;
 }
 
 // App Context Types
@@ -56,8 +50,8 @@ export interface DocumentItem {
 
 export interface Menu {
   navMain: MenuItem[];
-  navSecondary: MenuItem[];
-  documents: DocumentItem[];
+  navSecondary?: MenuItem[];
+  documents?: DocumentItem[];
   hidden: MenuItem[];
 }
 
@@ -71,4 +65,21 @@ export interface AppContextValue {
   menu: Menu;
   currentMenu: CurrentMenu;
   redirectToFirstMenu: () => boolean | void;
+}
+
+export interface AuthContextValue {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  login: UseMutationResult<
+    ApiResponse<AuthResponse>,
+    AxiosError<ApiResponse>,
+    LoginCredentials
+  >;
+  logout: UseMutationResult<ApiResponse, AxiosError<ApiResponse>, void>;
+  isAuthenticated: () => boolean;
+  can: (permission: string) => boolean;
+  canAny: (permissions: string[]) => boolean;
+  cannot: (permission: string) => boolean;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
 }

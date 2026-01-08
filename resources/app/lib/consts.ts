@@ -1,16 +1,5 @@
 // Query Keys Factory - Centralized key management
 export const queryKeys = {
-  // Auth
-  auth: {
-    user: ["auth", "user"] as const,
-  },
-
-  // Profile
-  profile: {
-    all: ["profile"] as const,
-    detail: () => [...queryKeys.profile.all, "detail"] as const,
-  },
-
   // Users
   users: {
     all: ["users"] as const,

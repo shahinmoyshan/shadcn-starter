@@ -15,12 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
 import { route } from "@/lib/utils";
-
-interface LoginFormData {
-  user: string;
-  password: string;
-  remember_me: boolean;
-}
+import { LoginCredentials } from "@/types/api";
 
 interface LoginErrors {
   user?: string[];
@@ -30,7 +25,7 @@ interface LoginErrors {
 }
 
 export default function Login() {
-  const [formData, setFormData] = useState<LoginFormData>({
+  const [formData, setFormData] = useState<LoginCredentials>({
     user: "",
     password: "",
     remember_me: true,

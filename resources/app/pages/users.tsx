@@ -22,25 +22,66 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Bread from "@/components/bread";
 import { headline } from "@/lib/utils";
 
+import { UserFormData } from "@/types/api";
+import type { Row } from "@tanstack/react-table";
+
+// Type definitions for component props
+interface PrivilegesBoxProps {
+  formData: UserFormData;
+  handleChange: (field: string, value: string | string[]) => void;
+}
+
+interface FormFieldsProps {
+  formData: UserFormData;
+  isEdit: boolean;
+  handleChange: (field: string, value: string | string[]) => void;
+}
+
+interface NameCellProps {
+  row: Row<User>;
+  onEdit: (user: User) => void;
+}
+
+interface EmailCellProps {
+  email: string;
+}
+
+interface PrivilegesCellProps {
+  privileges: string[];
+}
+
+interface ActionsCellProps {
+  user: User;
+  onEdit: (user: User) => void;
+  onDelete: (id: number) => void;
+  can: { edit: boolean; delete: boolean };
+}
+
+interface ColumnsCallbackParams {
+  handleEdit: (user: User) => void;
+  handleDelete: (id: number) => void;
+  can: { edit: boolean; delete: boolean };
+}
+
 // Privileges Box Component
-const PrivilegesBox = React.memo(({ formData, handleChange }) => {
-  const handlePrivilegeToggle = (privilegeKey) => {
+const PrivilegesBox = React.memo<PrivilegesBoxProps>(({ formData, handleChange }) => {
+  const handlePrivilegeToggle = (privilegeKey: string) => {
     const currentPrivileges = formData.privileges || [];
     const newPrivileges = currentPrivileges.includes(privilegeKey)
-      ? currentPrivileges.filter((p) => p !== privilegeKey)
+      ? currentPrivileges.filter((p: string) => p !== privilegeKey)
       : [...currentPrivileges, privilegeKey];
     handleChange("privileges", newPrivileges);
   };
 
-  const handleGroupToggle = (groupKey) => {
-    const groupPermissions = Object.keys(CONFIG.privileges[groupKey]);
+  const handleGroupToggle = (groupKey: string) => {
+    const groupPermissions = Object.keys(CONFIG.privileges[groupKey] || {});
     const currentPrivileges = formData.privileges || [];
     const allSelected = groupPermissions.every((p) =>
       currentPrivileges.includes(p)
     );
 
     const newPrivileges = allSelected
-      ? currentPrivileges.filter((p) => !groupPermissions.includes(p))
+      ? currentPrivileges.filter((p: string) => !groupPermissions.includes(p))
       : [...new Set([...currentPrivileges, ...groupPermissions])];
     handleChange("privileges", newPrivileges);
   };
@@ -120,7 +161,7 @@ const PrivilegesBox = React.memo(({ formData, handleChange }) => {
   );
 });
 
-const privilegeLabel = (key) => {
+const privilegeLabel = (key: string): string => {
   for (const group of Object.values(CONFIG.privileges)) {
     if (group[key]) {
       return group[key];
@@ -130,7 +171,7 @@ const privilegeLabel = (key) => {
 };
 
 // Memoized form fields component
-const FormFields = React.memo(({ formData, isEdit, handleChange }) => (
+const FormFields = React.memo<FormFieldsProps>(({ formData, isEdit, handleChange }) => (
   <div className="space-y-4 pb-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="space-y-2">
@@ -229,14 +270,14 @@ const FormFields = React.memo(({ formData, isEdit, handleChange }) => (
 ));
 
 // Memoized table cell components
-const NameCell = React.memo(({ row, onEdit }) => (
+const NameCell = React.memo<NameCellProps>(({ row, onEdit }) => (
   <Button
     variant="link"
     onClick={() => onEdit(row.original)}
     className="text-foreground w-fit px-0 text-left"
   >
     <img
-      src={row.original.avatar_url}
+      src={row.original.avatar_url || undefined}
       alt={row.original.display_name}
       className="inline-block w-6 h-6 rounded-full"
     />
@@ -244,13 +285,13 @@ const NameCell = React.memo(({ row, onEdit }) => (
   </Button>
 ));
 
-const EmailCell = React.memo(({ email }) => (
+const EmailCell = React.memo<EmailCellProps>(({ email }) => (
   <Badge variant="secondary">{email}</Badge>
 ));
 
-const PrivilegesCell = React.memo(({ privileges }) => {
+const PrivilegesCell = React.memo<PrivilegesCellProps>(({ privileges }) => {
   const count = privileges.length;
-  const permissions = privileges.slice(0, 3).map((per) => (
+  const permissions = privileges.slice(0, 3).map((per: string) => (
     <Badge key={per} variant="outline" className="text-muted-foreground">
       {privilegeLabel(per)}
     </Badge>
@@ -267,7 +308,7 @@ const PrivilegesCell = React.memo(({ privileges }) => {
   );
 });
 
-const ActionsCell = React.memo(({ user, onEdit, onDelete, can }) => (
+const ActionsCell = React.memo<ActionsCellProps>(({ user, onEdit, onDelete, can }) => (
   <div className="flex justify-end">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -276,18 +317,19 @@ const ActionsCell = React.memo(({ user, onEdit, onDelete, can }) => (
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="">
         {can.edit && (
-          <DropdownMenuItem onClick={() => onEdit(user)}>
+          <DropdownMenuItem onClick={() => onEdit(user)} className="" inset={false}>
             <Pencil className="mr-1 size-4" />
             Edit
           </DropdownMenuItem>
         )}
-        {can.edit && can.delete && <DropdownMenuSeparator />}
+        {can.edit && can.delete && <DropdownMenuSeparator className="" />}
         {can.delete && (
           <DropdownMenuItem
             onClick={() => onDelete(user.id)}
             className="text-destructive"
+            inset={false}
           >
             <Trash2 className="mr-1 size-4" />
             Delete
@@ -319,37 +361,37 @@ export default () =>
         edit: "users.edit",
       },
       recordCallback: (user) => ({
-        first_name: user.first_name || "",
-        last_name: user.last_name || "",
-        username: user.username || "",
-        email: user.email || "",
-        password: user.password || "",
-        privileges: user.privileges || [],
+        first_name: (user as unknown as User).first_name || "",
+        last_name: (user as unknown as User).last_name || "",
+        username: (user as unknown as User).username || "",
+        email: (user as unknown as User).email || "",
+        password: "",
+        privileges: (user as unknown as User).privileges || [],
       }),
       submitCallback: (formData) => formData,
     },
-    columnsCallback: ({ handleEdit, handleDelete, can }) => [
+    columnsCallback: (({ handleEdit, handleDelete, can }: ColumnsCallbackParams) => [
       {
         accessorKey: "name",
         header: "Name",
-        cell: ({ row }) => <NameCell row={row} onEdit={handleEdit} />,
+        cell: ({ row }: { row: Row<User> }) => <NameCell row={row} onEdit={handleEdit as unknown as (user: User) => void} />,
       },
       {
         accessorKey: "email",
         header: "Email",
-        cell: ({ row }) => <EmailCell email={row.original.email} />,
+        cell: ({ row }: { row: Row<User> }) => <EmailCell email={row.original.email} />,
       },
       {
         accessorKey: "privileges",
         header: "Privileges",
-        cell: ({ row }) => (
-          <PrivilegesCell privileges={row.original.privileges} />
+        cell: ({ row }: { row: Row<User> }) => (
+          <PrivilegesCell privileges={row.original.privileges || []} />
         ),
       },
       {
         accessorKey: "joined_at",
         header: "Joined At",
-        cell: ({ row }) => (
+        cell: ({ row }: { row: Row<User> }) => (
           <span className="text-sm text-muted-foreground">
             {row.original.joined_at}
           </span>
@@ -357,20 +399,24 @@ export default () =>
       },
       {
         id: "actions",
-        cell: ({ row }) =>
+        cell: ({ row }: { row: Row<User> }) =>
           (can.edit || can.delete) && (
             <ActionsCell
               user={row.original}
-              onEdit={handleEdit}
+              onEdit={handleEdit as unknown as (user: User) => void}
               onDelete={handleDelete}
               can={can}
             />
           ),
       },
-    ],
-    FormFields: FormFields,
-    fetchMutation: useUsers,
-    createMutation: useCreateUsers(),
-    updateMutation: useUpdateUsers(),
-    deleteMutation: useDeleteUsers(),
+    ]) as any,
+    FormFields: FormFields as unknown as React.ComponentType<{
+      formData: Record<string, unknown>;
+      isEdit: boolean;
+      handleChange: (field: string, value: unknown) => void;
+    }>,
+    fetchMutation: useUsers as any,
+    createMutation: useCreateUsers() as any,
+    updateMutation: useUpdateUsers() as any,
+    deleteMutation: useDeleteUsers() as any,
   });

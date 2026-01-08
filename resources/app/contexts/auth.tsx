@@ -1,32 +1,11 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { auth } from "@/lib/api";
-import type { ApiResponse, LoginResponse } from "@/types/api";
+import type { ApiResponse, LoginCredentials, AuthResponse } from "@/types/api";
+import { AuthContextValue } from "@/types/context";
 
-interface LoginCredentials {
-  user: string;
-  password: string;
-  remember_me?: boolean;
-}
-
-interface AuthContextValue {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  login: UseMutationResult<
-    ApiResponse<LoginResponse>,
-    AxiosError<ApiResponse>,
-    LoginCredentials
-  >;
-  logout: UseMutationResult<ApiResponse, AxiosError<ApiResponse>, void>;
-  isAuthenticated: () => boolean;
-  can: (permission: string) => boolean;
-  canAny: (permissions: string[]) => boolean;
-  cannot: (permission: string) => boolean;
-  isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
-}
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -36,15 +15,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   const login = useMutation<
-    ApiResponse<LoginResponse>,
+    AuthResponse,
     AxiosError<ApiResponse>,
     LoginCredentials
   >({
     mutationFn: async ({ user, password, remember_me = false }: LoginCredentials) => {
       const response = await auth.login({
-        username: user,
+        user,
         password,
-        remember: remember_me,
+        remember_me,
       });
       return response.data;
     },
@@ -52,8 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
     },
     onSuccess: (data) => {
-      if (data.success && data.data?.user) {
-        setUser(data.data.user);
+      if (data.success && data.user) {
+        setUser(data.user);
       }
       setIsLoading(false);
     },
@@ -85,14 +64,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const can = (permission: string): boolean => {
-    if (!isAuthenticated()) return false;
-    return user?.privileges ? user.privileges.includes(permission) : false;
+    if (!isAuthenticated() || !user?.privileges) return false;
+    return user.privileges.includes(permission);
   };
 
   const canAny = (permissions: string[]): boolean => {
-    if (!isAuthenticated()) return false;
+    if (!isAuthenticated() || !user?.privileges) return false;
     return permissions.some(
-      (permission) => user?.privileges ? user.privileges.includes(permission) : false
+      (permission) => user.privileges && user.privileges.includes(permission)
     );
   };
 

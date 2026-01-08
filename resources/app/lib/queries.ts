@@ -23,6 +23,7 @@ import type {
   UserUpdateData,
   ProfileUpdateData,
   PasswordUpdateData,
+  AuthResponse,
 } from "@/types/api";
 
 /**
@@ -182,22 +183,16 @@ export const useDeleteUsers = makeDeleteMutation(
 export function useUpdateProfile(
   options: Omit<
     UseMutationOptions<
-      AxiosResponse<ApiResponse<User>>,
+      AxiosResponse<AuthResponse>,
       AxiosError<ApiResponse>,
       ProfileUpdateData
     >,
     "mutationFn"
   > = {}
 ) {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: ProfileUpdateData) => profile.updateGeneral(data),
     onSuccess: (response) => {
-      // Update user in cache if provided
-      if (response.data.data) {
-        queryClient.setQueryData(queryKeys.auth.user, response.data.data);
-      }
       toast.success(response.data.message || "Profile updated successfully");
     },
     ...options,

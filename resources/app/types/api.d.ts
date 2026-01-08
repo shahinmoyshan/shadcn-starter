@@ -11,29 +11,33 @@ export interface ApiResponse<T = any> {
 // Paginated response structure
 export interface PaginatedResponse<T> {
   data: T[];
-  current_page: number;
-  per_page: number;
+  links: T[];
+  pages: number;
+  page: number;
+  offset: number;
+  limit: number;
+  first_item: number;
+  last_item: number;
   total: number;
-  last_page: number;
-  from: number;
-  to: number;
+  keyword: number;
 }
 
 // Auth API types
 export interface LoginCredentials {
-  username: string;
+  user: string;
   password: string;
-  remember?: boolean;
+  remember_me?: boolean;
 }
 
-export interface LoginResponse {
-  user: User;
-  token?: string;
+export interface AuthResponse {
+  success: boolean;
+  message?: string;
+  user?: User;
+  errors?: Record<string, string[]>;
 }
 
 // User API types
 export interface UserListParams {
-  page?: number;
   per_page?: number;
   search?: string;
 }
@@ -70,23 +74,4 @@ export interface PasswordUpdateData {
   current_password: string;
   password: string;
   password_confirmation: string;
-}
-
-// API client interface
-export interface ApiClient {
-  profile: {
-    get: () => Promise<AxiosResponse<ApiResponse<User>>>;
-    update: (data: ProfileUpdateData) => Promise<AxiosResponse<ApiResponse<User>>>;
-    updatePassword: (data: PasswordUpdateData) => Promise<AxiosResponse<ApiResponse>>;
-  };
-  auth: {
-    login: (credentials: LoginCredentials) => Promise<AxiosResponse<ApiResponse<LoginResponse>>>;
-    logout: () => Promise<AxiosResponse<ApiResponse>>;
-  };
-  users: {
-    list: (params?: UserListParams) => Promise<AxiosResponse<ApiResponse<PaginatedResponse<User>>>>;
-    store: (data: UserFormData) => Promise<AxiosResponse<ApiResponse<User>>>;
-    update: (id: number, data: UserUpdateData) => Promise<AxiosResponse<ApiResponse<User>>>;
-    destroy: (id: number) => Promise<AxiosResponse<ApiResponse>>;
-  };
 }

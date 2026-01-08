@@ -28,13 +28,13 @@ export default function Profile() {
   // Password form state
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
-    new_password: "",
-    new_password_confirmation: "",
+    password: "",
+    password_confirmation: "",
   });
 
   // Error states
-  const [generalErrors, setGeneralErrors] = useState({});
-  const [passwordErrors, setPasswordErrors] = useState({});
+  const [generalErrors, setGeneralErrors] = useState<Record<string, string[] | string | null>>({});
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string[] | string | null>>({});
   const [showPassword, setShowPassword] = useState(false);
 
   // Use centralized query hooks with error handling
@@ -61,8 +61,8 @@ export default function Profile() {
       setPasswordErrors({});
       setPasswordForm({
         current_password: "",
-        new_password: "",
-        new_password_confirmation: "",
+        password: "",
+        password_confirmation: "",
       });
     },
     onError: (error) => {
@@ -77,7 +77,7 @@ export default function Profile() {
   });
 
   // Handle general form change
-  const handleGeneralChange = (e) => {
+  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = e.target;
     setGeneralForm((prev) => ({
       ...prev,
@@ -90,7 +90,7 @@ export default function Profile() {
   };
 
   // Handle password form change
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = e.target;
     setPasswordForm((prev) => ({
       ...prev,
@@ -103,14 +103,14 @@ export default function Profile() {
   };
 
   // Submit general form
-  const handleGeneralSubmit = (e) => {
+  const handleGeneralSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setGeneralErrors({});
     generalMutation.mutate(generalForm);
   };
 
   // Submit password form
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPasswordErrors({});
     passwordMutation.mutate(passwordForm);
@@ -330,14 +330,14 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="new_password" className="block mb-2">
+                  <Label htmlFor="password" className="block mb-2">
                     New Password <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
-                    id="new_password"
-                    name="new_password"
+                    id="password"
+                    name="password"
                     type="password"
-                    value={passwordForm.new_password}
+                    value={passwordForm.password}
                     onChange={handlePasswordChange}
                     placeholder="Enter new password"
                     required
@@ -345,12 +345,12 @@ export default function Profile() {
                     maxLength={100}
                     disabled={passwordMutation.isPending}
                     className={
-                      passwordErrors.new_password ? "border-destructive" : ""
+                      passwordErrors.password ? "border-destructive" : ""
                     }
                   />
-                  {passwordErrors.new_password ? (
+                  {passwordErrors.password ? (
                     <p className="text-sm text-destructive">
-                      {passwordErrors.new_password[0]}
+                      {passwordErrors.password[0]}
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
@@ -361,17 +361,17 @@ export default function Profile() {
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="new_password_confirmation"
+                    htmlFor="password_confirmation"
                     className="block mb-2"
                   >
                     Confirm New Password{" "}
                     <sup className="text-destructive">*</sup>
                   </Label>
                   <Input
-                    id="new_password_confirmation"
-                    name="new_password_confirmation"
+                    id="password_confirmation"
+                    name="password_confirmation"
                     type="password"
-                    value={passwordForm.new_password_confirmation}
+                    value={passwordForm.password_confirmation}
                     onChange={handlePasswordChange}
                     placeholder="Confirm new password"
                     required
@@ -379,14 +379,14 @@ export default function Profile() {
                     maxLength={100}
                     disabled={passwordMutation.isPending}
                     className={
-                      passwordErrors.new_password_confirmation
+                      passwordErrors.password_confirmation
                         ? "border-destructive"
                         : ""
                     }
                   />
-                  {passwordErrors.new_password_confirmation && (
+                  {passwordErrors.password_confirmation && (
                     <p className="text-sm text-destructive">
-                      {passwordErrors.new_password_confirmation[0]}
+                      {passwordErrors.password_confirmation[0]}
                     </p>
                   )}
                 </div>

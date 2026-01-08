@@ -24,8 +24,13 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  SortingState,
+  ColumnDef,
 } from "@tanstack/react-table";
 import { useDebounce } from "use-debounce";
+import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import type { ApiResponse, PaginatedResponse } from "@/types/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,8 +60,72 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/auth";
 import PermissionDenied from "@/components/denied";
 
+// Type definitions
+interface BreadConfig {
+  title?: string;
+  name: string;
+  description?: string;
+  defaultForm: Record<string, unknown>;
+  permissions?: {
+    browse?: string;
+    create?: string;
+    delete?: string;
+    edit?: string;
+  };
+  recordCallback: (record: Record<string, unknown>) => Record<string, unknown>;
+  submitCallback: (formData: Record<string, unknown>) => Record<string, unknown>;
+  translations?: {
+    add_record?: string;
+    delete?: string;
+    delete_description?: string;
+    delete_no?: string;
+    delete_yes?: string;
+  };
+  disabled?: string[];
+}
+
+interface BreadDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  record: Record<string, unknown> | null;
+  createMutation: UseMutationResult<ApiResponse, AxiosError, unknown> | null;
+  updateMutation: UseMutationResult<ApiResponse, AxiosError, { id: number; data: unknown }> | null;
+  FormFields: React.ComponentType<{
+    formData: Record<string, unknown>;
+    isEdit: boolean;
+    handleChange: (field: string, value: unknown) => void;
+  }>;
+  config: BreadConfig;
+  cannot: (permission: string) => boolean;
+}
+
+interface BreadProps<TData = Record<string, unknown>> {
+  config: BreadConfig;
+  columnsCallback: (params: {
+    handleEdit: (record: TData) => void;
+    handleDelete: (id: number) => void;
+    handleCreate: () => void;
+    can: { delete: boolean; edit: boolean; create: boolean };
+  }) => ColumnDef<TData>[];
+  FormFields: React.ComponentType<{
+    formData: Record<string, unknown>;
+    isEdit: boolean;
+    handleChange: (field: string, value: unknown) => void;
+  }>;
+  fetchMutation: (params: QueryParams) => UseQueryResult<PaginatedResponse<TData>, AxiosError>;
+  deleteMutation: UseMutationResult<ApiResponse, AxiosError, number>;
+  createMutation: UseMutationResult<ApiResponse, AxiosError, unknown>;
+  updateMutation: UseMutationResult<ApiResponse, AxiosError, { id: number; data: unknown }>;
+}
+
+interface QueryParams {
+  page: number;
+  per_page: number;
+  search?: string;
+}
+
 // Memoized Bread Drawer Component
-const BreadDrawer = React.memo(
+const BreadDrawer = React.memo<BreadDrawerProps>(
   ({
     isOpen,
     onClose,
@@ -83,24 +152,24 @@ const BreadDrawer = React.memo(
       }
     }, [record, isOpen]);
 
-    const handleChange = React.useCallback((field, value) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+    const handleChange = React.useCallback((field: string, value: unknown) => {
+      setFormData((prev: Record<string, unknown>) => ({ ...prev, [field]: value }));
     }, []);
 
     const handleSubmit = React.useCallback(
-      async (e) => {
+      async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         try {
           // Combine country code and phone number
           const submitData = config.submitCallback(formData);
 
-          if (record?.id) {
+          if (record?.id && updateMutation) {
             await updateMutation.mutateAsync({
-              id: record.id,
+              id: record.id as number,
               data: submitData,
             });
-          } else {
+          } else if (createMutation) {
             await createMutation.mutateAsync(submitData);
           }
           onClose();
@@ -138,7 +207,7 @@ const BreadDrawer = React.memo(
 
         <div className="px-4 py-4 border-t mt-auto shrink-0">
           <div className="flex gap-2">
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
+            <Button type="submit" disabled={isSubmitting || false} className="flex-1">
               {isSubmitting ? "Saving..." : record ? "Update" : "Create"}
             </Button>
             <Button
@@ -146,7 +215,7 @@ const BreadDrawer = React.memo(
               type="button"
               onClick={onClose}
               className="flex-1"
-              disabled={isSubmitting}
+              disabled={isSubmitting || false}
             >
               Cancel
             </Button>
@@ -162,11 +231,11 @@ const BreadDrawer = React.memo(
         onOpenChange={onClose}
       >
         <DrawerContent className="data-[vaul-drawer-direction=right]:md:max-w-md">
-          <DrawerHeader>
-            <DrawerTitle>
+          <DrawerHeader className="">
+            <DrawerTitle className="">
               {record ? `Edit ${config.name}` : `Create ${config.name}`}
             </DrawerTitle>
-            <DrawerDescription>
+            <DrawerDescription className="">
               {record
                 ? `Update the ${config.name.toLowerCase()} details below`
                 : `Add a new ${config.name.toLowerCase()} using the form below`}
@@ -181,7 +250,7 @@ const BreadDrawer = React.memo(
   }
 );
 
-export default function Bread({
+export default function Bread<TData extends Record<string, unknown> = Record<string, unknown>>({
   config,
   columnsCallback,
   FormFields,
@@ -189,17 +258,17 @@ export default function Bread({
   deleteMutation,
   createMutation,
   updateMutation,
-}) {
+}: BreadProps<TData>) {
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [sorting, setSorting] = React.useState([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [selectedRecord, setSelectedRecord] = React.useState(null);
+  const [selectedRecord, setSelectedRecord] = React.useState<TData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [recordToDelete, setRecordToDelete] = React.useState(null);
+  const [recordToDelete, setRecordToDelete] = React.useState<number | null>(null);
 
   const { can, cannot } = useAuth();
 
@@ -207,8 +276,8 @@ export default function Bread({
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
   // Build query params
-  const queryParams = React.useMemo(() => {
-    const params = {
+  const queryParams = React.useMemo((): QueryParams => {
+    const params: QueryParams = {
       page: pagination.pageIndex + 1,
       per_page: pagination.pageSize,
     };
@@ -221,7 +290,7 @@ export default function Bread({
   }, [pagination.pageIndex, pagination.pageSize, debouncedSearchQuery]);
 
   // Use TanStack Query for data fetching
-  const { data: response, isLoading, error } = fetchMutation(queryParams);
+  const { data: response, isLoading } = fetchMutation(queryParams);
 
   // permission check
   if (
@@ -237,7 +306,7 @@ export default function Bread({
   const totalPages = response?.pages || 0;
   const totalItems = response?.total || 0;
 
-  const handleDelete = React.useCallback((id) => {
+  const handleDelete = React.useCallback((id: number) => {
     setRecordToDelete(id);
     setDeleteDialogOpen(true);
   }, []);
@@ -256,7 +325,7 @@ export default function Bread({
     }
   }, [recordToDelete, deleteMutation]);
 
-  const handleEdit = React.useCallback((record) => {
+  const handleEdit = React.useCallback((record: TData) => {
     setSelectedRecord(record);
     setDrawerOpen(true);
   }, []);
@@ -266,12 +335,12 @@ export default function Bread({
     setDrawerOpen(true);
   }, []);
 
-  const handleSearchChange = React.useCallback((e) => {
+  const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  const handlePageSizeChange = React.useCallback((value) => {
+  const handlePageSizeChange = React.useCallback((value: string) => {
     setPagination({
       pageIndex: 0,
       pageSize: Number(value),
@@ -528,21 +597,21 @@ export default function Bread({
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
           >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
+            <AlertDialogContent className="">
+              <AlertDialogHeader className="">
+                <AlertDialogTitle className="">
                   {config?.translations?.delete || "Are you absolutely sure?"}
                 </AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogDescription className="">
                   {config?.translations?.delete_description ||
                     `This action cannot be undone. This will permanently delete the ${config.name.toLowerCase()} and remove it from our servers.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>
+              <AlertDialogFooter className="">
+                <AlertDialogCancel className="">
                   {config?.translations?.delete_no || "Cancel"}
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={confirmDelete}>
+                <AlertDialogAction onClick={confirmDelete} className="">
                   {config?.translations?.delete_yes || "Yes, Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>

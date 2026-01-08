@@ -3,7 +3,7 @@ import type {
   ApiResponse,
   PaginatedResponse,
   LoginCredentials,
-  LoginResponse,
+  AuthResponse,
   UserListParams,
   UserFormData,
   UserUpdateData,
@@ -32,7 +32,7 @@ export const profile = {
 export const auth = {
   login: (
     data: LoginCredentials
-  ): Promise<AxiosResponse<ApiResponse<LoginResponse>>> =>
+  ): Promise<AxiosResponse<ApiResponse<AuthResponse>>> =>
     axios.post("/auth/login", data),
 
   logout: (): Promise<AxiosResponse<ApiResponse>> =>
