@@ -13,8 +13,7 @@ return new class {
             $table->string('username', 100)->unique()->required();
             $table->string('email', 100)->unique()->required();
             $table->string('password', 255)->required();
-            $table->json('privileges')->nullable();
-            $table->index(['first_name', 'last_name']);
+            $table->text('privileges')->nullable();
             $table->timestamps();
         });
     }

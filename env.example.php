@@ -14,7 +14,7 @@ return [
 
     // Application settings
     'app' => [
-        'name' => 'eZCRM', // Application name
+        'name' => 'TinyMVC', // Application name
         'timezone' => 'UTC', // Application timezone
     ],
 
